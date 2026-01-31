@@ -1,36 +1,132 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Find It! - Educational Learning Game for Kids
+
+An interactive web application for early childhood education where parents input concepts (colors, shapes, objects) and kids identify the matching visual representation from a set of options.
+
+## Features
+
+- **Dynamic Content Generation**: Local emoji/color database with LLM fallback for comprehensive coverage
+- **Age-Appropriate Rendering**: Solid color blocks for colors, large emojis for everything else
+- **Audio Feedback**: Web Audio API for success/error sounds (no external files needed)
+- **Text-to-Speech**: Announces the target word for pre-literate children
+- **Celebration Animations**: Canvas-based confetti particle system on success
+- **Multi-language Support**: Works with words in various languages
+
+## How It Works
+
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│  Parent Input   │ ──► │   Game Screen   │ ──► │ Success Screen  │
+│  (type a word)  │     │ (find the match)│     │   (celebrate!)  │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+```
+
+1. **Parent** enters a word (like "red", "cat", or "triangle")
+2. **App** generates 3 visual options (1 target + 2 distractors)
+3. **Kid** taps to find the matching item
+4. **Success** triggers confetti and "Play Again" option
+
+## Tech Stack
+
+- **Framework**: [Next.js](https://nextjs.org) 16 (App Router)
+- **UI**: React 19 + [Tailwind CSS](https://tailwindcss.com) v4
+- **Validation**: [Zod](https://zod.dev) for runtime type safety
+- **LLM**: Google Gemini 2.0 Flash Lite (via `ai` package)
+- **Testing**: [Vitest](https://vitest.dev)
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- npm, yarn, pnpm, or bun
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/daohoangson/find-it-app.git
+cd find-it-app
+
+# Install dependencies
+npm install
+```
+
+### Environment Variables
+
+Create a `.env.local` file:
+
+```bash
+# Required for LLM fallback (optional if using only local emoji/color database)
+AI_GATEWAY_API_KEY=your_api_key_here
+```
+
+> **Note**: The app works without an API key for common words thanks to the built-in emoji database (~460 emojis) and color dictionary (25+ colors with translations).
+
+### Development
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Testing
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm test
+```
 
-## Learn More
+### Build
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run build
+npm start
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+├── app/
+│   ├── api/generate/     # Content generation API route
+│   ├── page.tsx          # Main app logic & state management
+│   ├── layout.tsx        # Root layout with fonts
+│   └── globals.css       # Tailwind config & theme
+├── components/
+│   ├── InputScreen.tsx   # Parent word input
+│   ├── GameScreen.tsx    # Game play with options
+│   ├── SuccessScreen.tsx # Victory celebration
+│   ├── LoadingScreen.tsx # Loading indicator
+│   └── Confetti.tsx      # Particle animation
+├── lib/
+│   ├── audio.ts          # Web Audio API sounds
+│   ├── speech.ts         # Text-to-speech
+│   ├── emoji-data.ts     # Emoji database by category
+│   ├── game-content.ts   # Local content generation
+│   ├── schema.ts         # Zod validation schemas
+│   ├── shuffle.ts        # Fisher-Yates algorithm
+│   └── suggestions.ts    # Random word suggestions
+└── public/               # Static assets
+```
 
-## Deploy on Vercel
+## Content Generation Strategy
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The app uses a two-tier content generation approach:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **Local First** (fast, free):
+   - Color dictionary with 25+ CSS colors (English + translations)
+   - Emoji database with ~460 emojis across 15 categories
+   - Aliases for common words (e.g., "puppy" → 🐶)
+
+2. **LLM Fallback** (when local match not found):
+   - Uses Gemini 2.0 Flash Lite
+   - Generates contextually appropriate distractors
+   - Supports any language input
+
+## Target Audience
+
+- **Primary**: Pre-literate children (ages 2-5)
+- **Secondary**: Parents/educators as facilitators
+
+## License
+
+MIT
