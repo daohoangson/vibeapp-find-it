@@ -1,5 +1,4 @@
-import { anthropic } from "@ai-sdk/anthropic";
-import { generateObject } from "ai";
+import { generateText, Output } from "ai";
 import { NextResponse } from "next/server";
 import { GameContentSchema } from "@/lib/schema";
 
@@ -32,14 +31,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Word is required" }, { status: 400 });
     }
 
-    const { object } = await generateObject({
-      model: anthropic("claude-haiku-4-5-20250514"),
-      schema: GameContentSchema,
+    const { output } = await generateText({
+      model: "alibaba/qwen-3-32b",
+      output: Output.object({
+        schema: GameContentSchema,
+      }),
       system: SYSTEM_PROMPT,
       prompt: `Generate game content for the word: "${word.trim()}"`,
     });
 
-    return NextResponse.json(object);
+    return NextResponse.json(output);
   } catch (error) {
     console.error("Generate error:", error);
     return NextResponse.json(
