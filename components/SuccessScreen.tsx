@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { Sparkles, RefreshCw } from "lucide-react";
 import { Confetti } from "./Confetti";
+import { playSuccessSound } from "@/lib/audio";
 
 interface SuccessScreenProps {
   inputWord: string;
@@ -45,9 +47,16 @@ export function SuccessScreen({
   type,
   onPlayAgain,
 }: SuccessScreenProps) {
+  const [confettiKey, setConfettiKey] = useState(0);
+
+  const handleTargetTap = () => {
+    playSuccessSound();
+    setConfettiKey((prev) => prev + 1);
+  };
+
   return (
     <main className="fixed inset-0 flex flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-blue-50 to-indigo-100 p-6">
-      <Confetti />
+      <Confetti key={confettiKey} />
 
       <section className="z-10 flex max-h-full w-full max-w-lg flex-col items-center">
         <div className="mb-4 shrink-0 animate-bounce rounded-full bg-white p-4 shadow-2xl sm:mb-8 sm:p-6">
@@ -64,11 +73,15 @@ export function SuccessScreen({
           You found the {inputWord}!
         </p>
 
-        <div className="mb-6 shrink-0 rotate-3 rounded-3xl border-b-8 border-slate-200 bg-white p-4 shadow-2xl transition-transform duration-500 hover:rotate-0 sm:mb-12 sm:p-6">
+        <button
+          onClick={handleTargetTap}
+          className="mb-6 shrink-0 rotate-3 cursor-pointer rounded-3xl border-b-8 border-slate-200 bg-white p-4 shadow-2xl transition-transform duration-200 hover:scale-105 hover:rotate-0 focus:ring-2 focus:ring-blue-500 focus:outline-none active:scale-95 sm:mb-12 sm:p-6"
+          aria-label="Tap to celebrate again!"
+        >
           <div className="flex h-32 w-32 items-center justify-center rounded-2xl bg-slate-50 sm:h-64 sm:w-64">
             <TargetDisplay targetValue={targetValue} type={type} />
           </div>
-        </div>
+        </button>
 
         <button
           onClick={onPlayAgain}
