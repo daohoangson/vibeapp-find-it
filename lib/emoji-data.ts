@@ -1226,18 +1226,19 @@ export function getDistractors(
 }
 
 /**
- * Get all available emoji names for suggestions (shortest name for each emoji)
+ * Get unique shortest names from all emojis for suggestions.
+ * Deduplicates since multiple emojis may share the same shortest name (e.g., "flower").
  */
-export function getAllEmojiNames(): string[] {
-  const names: string[] = [];
+export function getShortestEmojiNames(): string[] {
+  const names = new Set<string>();
   EMOJI_DATABASE.forEach((cat) => {
     cat.items.forEach((item) => {
       // Pick the shortest name for display
       const shortest = item.names.reduce((a, b) =>
         a.length <= b.length ? a : b,
       );
-      names.push(shortest);
+      names.add(shortest);
     });
   });
-  return names;
+  return [...names];
 }

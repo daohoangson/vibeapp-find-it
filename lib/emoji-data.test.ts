@@ -5,7 +5,7 @@ import {
   getDistractors,
   findEmojiByName,
   getEmojisByCategory,
-  getAllEmojiNames,
+  getShortestEmojiNames,
 } from "./emoji-data";
 
 describe("areVisuallySimilar", () => {
@@ -139,18 +139,25 @@ describe("findEmojiByName", () => {
   });
 });
 
-describe("getAllEmojiNames", () => {
+describe("getShortestEmojiNames", () => {
   it("should return shortest names for suggestions", () => {
-    const names = getAllEmojiNames();
+    const names = getShortestEmojiNames();
 
     // Should include short names
     expect(names).toContain("dog"); // not "dog face"
     expect(names).toContain("flower"); // not "cherry blossom" for 🌸
   });
 
-  it("should return many names", () => {
-    const names = getAllEmojiNames();
+  it("should return many unique names", () => {
+    const names = getShortestEmojiNames();
     expect(names.length).toBeGreaterThan(100);
+  });
+
+  it("should deduplicate names", () => {
+    const names = getShortestEmojiNames();
+    const uniqueNames = new Set(names);
+    // All names should be unique (no duplicates)
+    expect(names.length).toBe(uniqueNames.size);
   });
 });
 

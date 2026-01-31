@@ -1,4 +1,4 @@
-import { getAllEmojiNames } from "./emoji-data";
+import { getShortestEmojiNames } from "./emoji-data";
 import { shuffle } from "./shuffle";
 
 // CSS color names for suggestions
@@ -20,7 +20,7 @@ const COLOR_NAMES = [
  * Returns n random unique suggestions (mix of colors and emoji names)
  */
 export function getRandomSuggestions(count: number = 4): string[] {
-  const emojiNames = getAllEmojiNames();
+  const emojiNames = getShortestEmojiNames();
   const allSuggestions = [...COLOR_NAMES, ...emojiNames];
 
   // Shuffle and take count items
