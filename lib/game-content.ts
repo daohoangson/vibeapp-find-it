@@ -1,3 +1,4 @@
+import { generateText, Output } from "ai";
 import {
   findEmojiByName,
   getDistractors,
@@ -6,7 +7,27 @@ import {
   getEmojisByCategory,
 } from "./emoji-data";
 import { shuffle } from "./shuffle";
-import type { GameContent } from "./schema";
+import { GameContentSchema, type GameContent } from "./schema";
+
+const LLM_SYSTEM_PROMPT = `You are a helpful assistant for a children's educational game called "Find It!".
+A parent has entered a word, and you need to generate game content for their child to find.
+
+Rules:
+1. If the word is a COLOR (like "red", "blue", "verde", "rot", etc. in any language):
+   - Set type to "color"
+   - Set targetValue to a valid CSS color name (e.g., "red", "blue", "green")
+   - Set distractors to 2 OTHER distinct CSS color names that are visually different
+
+2. If the word is ANYTHING ELSE (animal, shape, object, food, etc.):
+   - Set type to "emoji"
+   - Set targetValue to a single emoji representing the word
+   - Set distractors to 2 OTHER related but different emojis from the same category
+
+Important:
+- Accept input in ANY language and translate to appropriate content
+- Keep emojis simple and recognizable for young children (ages 2-5)
+- Make sure all 3 options (target + 2 distractors) are visually distinct
+- For colors, use only basic CSS color names children can see clearly`;
 
 // CSS color names that we can handle locally
 const CSS_COLORS: Record<string, string> = {
@@ -183,4 +204,40 @@ export function fixVisuallySimilarEmojis(content: GameContent): GameContent {
 
   // If we still can't fix it, return original (LLM might have valid reasoning)
   return content;
+}
+
+/**
+ * Generate game content for a word.
+ * Tries local generation first, falls back to LLM for unknown words.
+ */
+export async function generateGameContent(
+  word: string,
+): Promise<GameContent | null> {
+  // Try local generation first (fast, no API cost)
+  const localContent = generateLocalContent(word);
+  if (localContent) {
+    return localContent;
+  }
+
+  // Fall back to LLM for unknown words
+  try {
+    const { output } = await generateText({
+      model: "google/gemini-2.0-flash-lite",
+      output: Output.object({
+        schema: GameContentSchema,
+      }),
+      system: LLM_SYSTEM_PROMPT,
+      prompt: `Generate game content for the word: "${word.trim()}"`,
+    });
+
+    if (!output) {
+      return null;
+    }
+
+    // Auto-fix visually similar emojis from LLM response
+    return fixVisuallySimilarEmojis(output);
+  } catch (error) {
+    console.error("LLM generation error:", error);
+    return null;
+  }
 }

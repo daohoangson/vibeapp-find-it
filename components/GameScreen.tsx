@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ArrowLeft, Volume2 } from "lucide-react";
 import { isSpeechAvailable, speakWord } from "@/lib/speech";
 
@@ -53,7 +53,13 @@ export function GameScreen({
   onBack,
 }: GameScreenProps) {
   const hasCorrectAnswer = items.some((item) => item.status === "correct");
-  const speechAvailable = isSpeechAvailable();
+
+  // Check speech availability only on client to avoid hydration mismatch
+  const [speechAvailable, setSpeechAvailable] = useState(false);
+
+  useEffect(() => {
+    setSpeechAvailable(isSpeechAvailable());
+  }, []);
 
   // Announce the word when the game screen loads
   useEffect(() => {
