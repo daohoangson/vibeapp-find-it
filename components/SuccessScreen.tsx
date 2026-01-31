@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, PartyPopper } from "lucide-react";
 import { Confetti } from "./Confetti";
 import { playSuccessSound } from "@/lib/audio";
 
@@ -24,7 +24,7 @@ function TargetDisplay({
   if (type === "color") {
     return (
       <div
-        className="h-full w-full rounded-2xl"
+        className="h-full w-full rounded-2xl shadow-inner border-2 border-black/5"
         style={{ backgroundColor: targetValue }}
         role="img"
         aria-label={`Color: ${targetValue}`}
@@ -34,7 +34,7 @@ function TargetDisplay({
 
   return (
     <div
-      className="flex h-full w-full items-center justify-center text-8xl leading-none sm:text-9xl"
+      className="flex h-full w-full items-center justify-center text-8xl leading-none sm:text-9xl drop-shadow-sm filter"
       role="img"
       aria-label={`Emoji: ${targetValue}`}
     >
@@ -59,35 +59,52 @@ export function SuccessScreen({
   };
 
   return (
-    <main className="fixed inset-0 flex flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-blue-50 to-indigo-100 p-6">
+    <main className="fixed inset-0 flex flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-sky-100 via-blue-50 to-emerald-50 p-6">
       <Confetti key={confettiKey} />
 
+      {/* Background decoration */}
+      <div className="absolute top-0 left-0 h-full w-full overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 h-64 w-64 rounded-full bg-yellow-300 opacity-20 blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 h-64 w-64 rounded-full bg-sky-300 opacity-20 blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+      </div>
+
       <section className="z-10 flex max-h-full w-full max-w-lg flex-col items-center overflow-y-auto">
-        <h1 className="mb-2 shrink-0 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-center text-4xl font-black text-transparent sm:mb-4 sm:text-5xl">
+        <div className="mb-2 flex items-center gap-2 rounded-full bg-white/50 px-4 py-1 backdrop-blur-sm">
+          <PartyPopper className="h-5 w-5 text-amber-500" />
+          <span className="text-sm font-bold text-slate-500 uppercase tracking-widest">You did it!</span>
+        </div>
+
+        <h1 className="mb-2 shrink-0 bg-gradient-to-r from-sky-600 via-blue-500 to-emerald-500 bg-clip-text text-center text-5xl font-black text-transparent drop-shadow-sm sm:mb-4 sm:text-6xl animate-bounce-gentle">
           Amazing!
         </h1>
-        <p className="mb-4 shrink-0 text-xl font-medium text-slate-600 sm:mb-6 sm:text-2xl">
-          You have found it!
+        <p className="mb-6 shrink-0 text-xl font-bold text-slate-600 sm:mb-8 sm:text-2xl">
+          You found the <span className="text-sky-600 underline decoration-wavy decoration-sky-300 underline-offset-4">{inputWord}</span>!
         </p>
 
         <button
           onClick={handleTargetTap}
-          className="mb-6 shrink-0 rotate-3 cursor-pointer rounded-3xl border-b-8 border-slate-200 bg-white p-4 shadow-2xl transition-transform duration-200 hover:scale-105 hover:rotate-0 focus:ring-2 focus:ring-blue-500 focus:outline-none active:scale-95 sm:mb-8 sm:p-6"
+          className="mb-8 shrink-0 rotate-3 cursor-pointer rounded-[2.5rem] border-b-[8px] border-slate-200 bg-white p-4 shadow-2xl transition-all duration-200 hover:scale-110 hover:rotate-0 hover:border-b-[12px] hover:shadow-sky-500/20 focus:ring-4 focus:ring-sky-500/30 focus:outline-none active:scale-95 active:border-b-4 sm:mb-10 sm:p-6"
           aria-label="Tap to celebrate again!"
         >
-          <div className="flex h-28 w-28 items-center justify-center rounded-2xl bg-slate-50 sm:h-48 sm:w-48">
+          <div className="flex h-32 w-32 items-center justify-center rounded-3xl bg-slate-50 border-4 border-slate-100 sm:h-52 sm:w-52">
             <TargetDisplay targetValue={targetValue} type={type} />
           </div>
         </button>
 
         {/* Quick play suggestions */}
-        <p className="mb-3 text-sm font-medium text-slate-500">Play next:</p>
-        <div className="mb-6 flex shrink-0 flex-wrap justify-center gap-2">
-          {suggestions.map((word) => (
+        <p className="mb-4 text-sm font-bold text-slate-400 uppercase tracking-widest">Play next:</p>
+        <div className="mb-8 flex shrink-0 flex-wrap justify-center gap-3">
+          {suggestions.map((word, i) => (
             <button
               key={word}
               onClick={() => onSuggestionClick(word)}
-              className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-600 capitalize shadow-md transition-all hover:bg-blue-100 hover:text-blue-600 focus:ring-2 focus:ring-blue-500 focus:outline-none active:scale-95"
+              className={`rounded-xl px-4 py-2 text-sm font-bold transition-all hover:-translate-y-1 hover:shadow-md active:translate-y-0
+                ${
+                  i % 2 === 0
+                    ? "bg-white text-sky-600 shadow-sm hover:bg-sky-50 ring-1 ring-sky-100"
+                    : "bg-white text-emerald-600 shadow-sm hover:bg-emerald-50 ring-1 ring-emerald-100"
+                }
+              `}
             >
               {word}
             </button>
@@ -96,10 +113,10 @@ export function SuccessScreen({
 
         <button
           onClick={onPlayAgain}
-          className="flex shrink-0 items-center gap-3 rounded-full bg-green-500 px-8 py-4 text-xl font-bold text-white shadow-lg shadow-green-500/40 transition-all hover:-translate-y-1 hover:bg-green-600 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none active:translate-y-1 sm:px-10 sm:py-5 sm:text-xl"
+          className="group flex shrink-0 items-center gap-3 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 px-10 py-5 text-xl font-black text-white shadow-xl shadow-emerald-500/30 transition-all hover:-translate-y-1 hover:shadow-2xl hover:shadow-emerald-500/40 hover:scale-105 focus:ring-4 focus:ring-emerald-500/30 focus:outline-none active:translate-y-1 active:scale-95 sm:text-2xl"
         >
-          <RefreshCw className="h-6 w-6" />
-          New Word
+          <RefreshCw className="h-7 w-7 transition-transform group-hover:rotate-180" />
+          Play Again
         </button>
       </section>
     </main>

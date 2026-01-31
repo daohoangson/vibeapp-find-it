@@ -14,12 +14,12 @@ interface Particle {
 }
 
 const COLORS = [
-  "#EF4444",
-  "#F59E0B",
-  "#10B981",
-  "#3B82F6",
-  "#8B5CF6",
-  "#EC4899",
+  "#0ea5e9", // Sky 500
+  "#10b981", // Emerald 500
+  "#3b82f6", // Blue 500
+  "#facc15", // Amber 400
+  "#2dd4bf", // Teal 400
+  "#818cf8", // Indigo 400
 ];
 
 export function Confetti() {

@@ -2,4 +2,33 @@
 
 @theme inline {
   --font-sans: var(--font-geist-sans);
+
+  /* Updated Kid-friendly color palette (Blue/Green focus) */
+  --color-brand-primary: #0ea5e9; /* Sky 500 */
+  --color-brand-secondary: #10b981; /* Emerald 500 */
+  --color-brand-accent: #f59e0b; /* Amber 500 (for pop) */
+  --color-brand-background: #f0f9ff; /* Very light sky blue */
+  --color-brand-surface: #ffffff;
+  --color-brand-text: #0f172a; /* Slate 900 */
+}
+
+body {
+  background-color: var(--color-brand-background);
+  color: var(--color-brand-text);
+  font-family: var(--font-sans);
+}
+
+@keyframes bounce-gentle {
+  0%, 100% {
+    transform: translateY(-5%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+.animate-bounce-gentle {
+  animation: bounce-gentle 2s infinite;
 }
