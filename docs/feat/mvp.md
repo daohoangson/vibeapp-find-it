@@ -64,29 +64,31 @@ Interactive web application for early childhood education where parents input co
 
 **1. Dynamic Content Generation**
 
-- API generates 3 related items based on input word
-- Randomized order on each generation
+- LLM generates 1 target + 2 distractors based on input word
+- Response format: `{ "type": "color" | "emoji", "targetValue": string, "distractors": [string, string] }`
+- Items shuffled randomly before display
 
 **2. Age-Appropriate Rendering**
 
-- **Colors**: Solid color blocks (no text) - `background-color: [color_name]`
-- **things**: Unicode emoji (animals, shapes, flags, etc.)
+- **Colors**: Solid color blocks using CSS `background-color` (no text labels)
+- **Everything else**: Single Unicode emoji (animals, shapes, objects, flags, etc.)
 
 **3. Interaction Feedback**
 
-- **Incorrect**: Gray overlay, remains disabled
-- **Correct**: Success animation + audio + confetti particles
+- **Incorrect tap**: Gray out + disable the tapped option (child can keep trying)
+- **Correct tap**: Visual highlight → 1.5s delay → transition to success screen
 
-**4. Audio Feedback**
+**4. Audio Feedback (Web Audio API)**
 
-- Procedurally generated melody using Web Audio API
-- Ascending note sequence (C5 → E5 → G5 → C6)
+- **Correct**: Ascending arpeggio C5 → E5 → G5 → C6 (sine wave)
+- **Incorrect**: Short descending tone (optional enhancement)
 - No external audio files required
 
-**5. Learning Reinforcement**
+**5. Success Screen**
 
-- Success screen displays both visual and text representation
-- Enhances word-visual association for memorization
+- Confetti particle animation
+- Display the correct answer (visual + text label)
+- "Play Again" button to restart
 
 ### Target Audience
 
