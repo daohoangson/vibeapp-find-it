@@ -1,7 +1,10 @@
 import { generateText, Output } from "ai";
 import { NextResponse } from "next/server";
 import { GameContentSchema } from "@/lib/schema";
-import { generateLocalContent } from "@/lib/game-content";
+import {
+  generateLocalContent,
+  fixVisuallySimilarEmojis,
+} from "@/lib/game-content";
 
 const SYSTEM_PROMPT = `You are a helpful assistant for a children's educational game called "Find It!".
 A parent has entered a word, and you need to generate game content for their child to find.
@@ -48,7 +51,10 @@ export async function POST(request: Request) {
       prompt: `Generate game content for the word: "${word.trim()}"`,
     });
 
-    return NextResponse.json(output);
+    // Auto-fix visually similar emojis from LLM response
+    const fixedOutput = output ? fixVisuallySimilarEmojis(output) : output;
+
+    return NextResponse.json(fixedOutput);
   } catch (error) {
     console.error("Generate error:", error);
     return NextResponse.json(

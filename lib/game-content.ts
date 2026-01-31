@@ -1,4 +1,11 @@
-import { findEmojiByName, getDistractors } from "./emoji-data";
+import {
+  findEmojiByName,
+  getDistractors,
+  areVisuallySimilar,
+  getCategoryByEmoji,
+  getEmojisByCategory,
+} from "./emoji-data";
+import { shuffle } from "./shuffle";
 import type { GameContent } from "./schema";
 
 // CSS color names that we can handle locally
@@ -65,7 +72,7 @@ function getColorDistractors(targetColor: string, count: number = 2): string[] {
   );
 
   // Shuffle and pick
-  const shuffled = [...new Set(otherColors)].sort(() => Math.random() - 0.5);
+  const shuffled = shuffle([...new Set(otherColors)]);
   return shuffled.slice(0, count);
 }
 
@@ -110,4 +117,70 @@ export function generateLocalContent(word: string): GameContent | null {
 
   // No local match found
   return null;
+}
+
+/**
+ * Auto-fix LLM response if it contains visually similar emojis.
+ * Replaces similar distractors with non-similar ones from same category.
+ */
+export function fixVisuallySimilarEmojis(content: GameContent): GameContent {
+  if (content.type !== "emoji") {
+    return content;
+  }
+
+  const target = content.targetValue;
+  const distractors = [...content.distractors];
+  let needsFix = false;
+
+  // Check each distractor for visual similarity to target
+  for (let i = 0; i < distractors.length; i++) {
+    if (areVisuallySimilar(target, distractors[i])) {
+      needsFix = true;
+      break;
+    }
+  }
+
+  // Also check if distractors are similar to each other
+  if (!needsFix && distractors.length >= 2) {
+    if (areVisuallySimilar(distractors[0], distractors[1])) {
+      needsFix = true;
+    }
+  }
+
+  if (!needsFix) {
+    return content;
+  }
+
+  // Try to find the category and get proper distractors
+  const category = getCategoryByEmoji(target);
+  if (category) {
+    const categoryEmojis = getEmojisByCategory(category);
+    const validDistractors = categoryEmojis.filter(
+      (item) =>
+        item.emoji !== target && !areVisuallySimilar(target, item.emoji),
+    );
+
+    if (validDistractors.length >= 2) {
+      const shuffled = shuffle([...validDistractors]);
+      return {
+        ...content,
+        distractors: [shuffled[0].emoji, shuffled[1].emoji],
+      };
+    }
+  }
+
+  // Fallback: filter out similar ones from original distractors
+  const filtered = distractors.filter(
+    (d) => !areVisuallySimilar(target, d) && d !== target,
+  );
+
+  if (filtered.length >= 2) {
+    return {
+      ...content,
+      distractors: [filtered[0], filtered[1]],
+    };
+  }
+
+  // If we still can't fix it, return original (LLM might have valid reasoning)
+  return content;
 }

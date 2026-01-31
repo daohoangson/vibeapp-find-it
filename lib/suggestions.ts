@@ -1,4 +1,5 @@
 import { getAllEmojiNames } from "./emoji-data";
+import { shuffle } from "./shuffle";
 
 // CSS color names for suggestions
 const COLOR_NAMES = [
@@ -23,6 +24,6 @@ export function getRandomSuggestions(count: number = 4): string[] {
   const allSuggestions = [...COLOR_NAMES, ...emojiNames];
 
   // Shuffle and take count items
-  const shuffled = allSuggestions.sort(() => Math.random() - 0.5);
+  const shuffled = shuffle([...allSuggestions]);
   return shuffled.slice(0, count);
 }
