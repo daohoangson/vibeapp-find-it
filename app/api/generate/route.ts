@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     }
 
     const { output } = await generateText({
-      model: "alibaba/qwen-3-32b",
+      model: "google/gemini-2.0-flash-lite",
       output: Output.object({
         schema: GameContentSchema,
       }),
