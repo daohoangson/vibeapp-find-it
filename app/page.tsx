@@ -8,6 +8,8 @@ import {
   SuccessScreen,
   type GameItem,
 } from "@/components";
+import { unlockAudio, playSuccessSound, playErrorSound } from "@/lib/audio";
+import { shuffle } from "@/lib/shuffle";
 
 type Screen = "input" | "loading" | "game" | "success";
 
@@ -33,6 +35,9 @@ export default function Home() {
 
   const handleStart = async () => {
     if (!inputWord.trim()) return;
+
+    // Unlock audio on user interaction (required for iOS/Chrome)
+    await unlockAudio();
 
     setScreen("loading");
     setErrorMsg("");
@@ -71,11 +76,7 @@ export default function Home() {
         },
       ];
 
-      // Shuffle
-      for (let i = newItems.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [newItems[i], newItems[j]] = [newItems[j], newItems[i]];
-      }
+      shuffle(newItems);
 
       setGameData({ type: data.type, targetValue: data.targetValue });
       setItems(newItems);
@@ -94,6 +95,7 @@ export default function Home() {
     if (!clickedItem || clickedItem.status === "wrong") return;
 
     if (clickedItem.isCorrect) {
+      playSuccessSound();
       setItems((prev) =>
         prev.map((item) =>
           item.id === id ? { ...item, status: "correct" } : item,
@@ -101,6 +103,7 @@ export default function Home() {
       );
       setTimeout(() => setScreen("success"), 1500);
     } else {
+      playErrorSound();
       setItems((prev) =>
         prev.map((item) =>
           item.id === id ? { ...item, status: "wrong" } : item,
