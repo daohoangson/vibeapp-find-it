@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Sparkles, RefreshCw } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 import { Confetti } from "./Confetti";
 import { playSuccessSound } from "@/lib/audio";
 
@@ -59,18 +59,11 @@ export function SuccessScreen({
       <Confetti key={confettiKey} />
 
       <section className="z-10 flex max-h-full w-full max-w-lg flex-col items-center">
-        <div className="mb-4 shrink-0 animate-bounce rounded-full bg-white p-4 shadow-2xl sm:mb-8 sm:p-6">
-          <Sparkles
-            className="h-12 w-12 text-yellow-400 sm:h-20 sm:w-20"
-            fill="currentColor"
-          />
-        </div>
-
         <h1 className="mb-2 shrink-0 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-center text-4xl font-black text-transparent sm:mb-4 sm:text-6xl">
           Amazing!
         </h1>
         <p className="mb-6 shrink-0 text-xl font-medium text-slate-600 sm:mb-12 sm:text-2xl">
-          You found the {inputWord}!
+          You have found it!
         </p>
 
         <button
