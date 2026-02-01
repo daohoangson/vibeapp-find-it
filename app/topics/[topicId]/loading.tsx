@@ -1,52 +1,65 @@
 export default function TopicDetailLoading() {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-sky-100 via-blue-50 to-emerald-50">
+    <main className="min-h-screen overflow-x-hidden bg-gradient-to-br from-sky-100 via-blue-50 to-emerald-50 pb-12">
+      {/* Background decoration */}
+      <div className="fixed -top-20 -left-20 h-64 w-64 rounded-full bg-sky-300 opacity-20 blur-3xl animate-pulse" />
+      <div className="fixed top-40 -right-20 h-80 w-80 rounded-full bg-emerald-300 opacity-20 blur-3xl animate-pulse delay-700" />
+
       {/* Header skeleton */}
-      <header className="sticky top-0 z-20 bg-white/80 px-4 py-4 shadow-sm backdrop-blur-md sm:px-6">
+      <header className="sticky top-0 z-20 px-4 py-4 sm:px-6">
         <div className="mx-auto flex max-w-4xl items-center justify-between">
-          <div className="h-12 w-12 animate-pulse rounded-full bg-slate-200" />
+          <div className="h-12 w-12 animate-pulse rounded-full bg-white/80 shadow-sm" />
           <div className="w-12" />
         </div>
       </header>
 
       {/* Content skeleton */}
-      <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-12">
+      <div className="relative z-10 mx-auto max-w-4xl px-4 py-4 sm:px-6 sm:py-8">
         {/* Topic header skeleton */}
-        <div className="mb-8 flex flex-col items-center text-center">
-          <div className="mb-4 h-24 w-24 animate-pulse rounded-full bg-slate-200 sm:h-28 sm:w-28" />
-          <div className="mb-2 h-10 w-48 animate-pulse rounded-lg bg-slate-200" />
-          <div className="h-6 w-72 animate-pulse rounded bg-slate-200" />
+        <div className="mb-8 flex flex-col items-center text-center sm:mb-12">
+          <div className="mb-6 h-32 w-32 animate-pulse rounded-[2rem] bg-white shadow-xl sm:h-40 sm:w-40" />
+          <div className="mb-3 h-10 w-64 animate-pulse rounded-lg bg-slate-200/50 sm:h-14 sm:w-80" />
+          <div className="h-6 w-full max-w-md animate-pulse rounded bg-slate-200/50" />
+          <div className="mt-2 h-6 w-3/4 max-w-sm animate-pulse rounded bg-slate-200/50" />
         </div>
 
-        {/* Learning goals skeleton */}
-        <div className="mb-8 rounded-2xl bg-white p-6 shadow-md">
-          <div className="mb-4 h-6 w-36 animate-pulse rounded bg-slate-200" />
-          <div className="space-y-3">
-            {[1, 2, 3].map((goal) => (
-              <div key={goal} className="flex items-center gap-2">
-                <div className="h-2 w-2 animate-pulse rounded-full bg-slate-200" />
-                <div className="h-5 flex-1 animate-pulse rounded bg-slate-200" />
-              </div>
-            ))}
+        <div className="grid gap-8 md:grid-cols-2">
+          {/* Learning goals skeleton */}
+          <div className="rounded-3xl bg-white/80 p-6 shadow-xl backdrop-blur-sm sm:p-8">
+            <div className="mb-6 flex items-center gap-3">
+              <div className="h-10 w-10 animate-pulse rounded-xl bg-sky-100" />
+              <div className="h-6 w-40 animate-pulse rounded bg-slate-200" />
+            </div>
+            <div className="space-y-4">
+              {[1, 2, 3].map((goal) => (
+                <div key={goal} className="flex items-center gap-3">
+                  <div className="h-5 w-5 animate-pulse rounded-full bg-emerald-200" />
+                  <div className="h-5 flex-1 animate-pulse rounded bg-slate-200" />
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Word preview skeleton */}
-        <div className="mb-8 rounded-2xl bg-white p-6 shadow-md">
-          <div className="mb-4 h-6 w-40 animate-pulse rounded bg-slate-200" />
-          <div className="flex flex-wrap gap-2">
-            {[1, 2, 3, 4, 5, 6].map((word) => (
-              <div
-                key={word}
-                className="h-8 w-16 animate-pulse rounded-full bg-slate-200"
-              />
-            ))}
+          {/* Word preview skeleton */}
+          <div className="rounded-3xl bg-white/80 p-6 shadow-xl backdrop-blur-sm sm:p-8">
+            <div className="mb-6 flex items-center justify-between">
+              <div className="h-6 w-32 animate-pulse rounded bg-slate-200" />
+              <div className="h-6 w-20 animate-pulse rounded-full bg-slate-100" />
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((word) => (
+                <div
+                  key={word}
+                  className="h-10 w-24 animate-pulse rounded-xl bg-sky-50 border border-sky-100"
+                />
+              ))}
+            </div>
           </div>
         </div>
 
         {/* Button skeleton */}
-        <div className="flex justify-center">
-          <div className="h-16 w-56 animate-pulse rounded-full bg-slate-200" />
+        <div className="mt-12 flex justify-center">
+          <div className="h-20 w-64 animate-pulse rounded-full bg-sky-200/50 shadow-xl" />
         </div>
       </div>
     </main>
