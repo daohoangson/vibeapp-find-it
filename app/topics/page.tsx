@@ -67,9 +67,14 @@ export default function TopicsPage() {
               </div>
 
               {/* Topic Cards Grid */}
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
                 {topics.map((topic) => (
-                  <TopicCard key={topic.id} topic={topic} />
+                  <div
+                    key={topic.id}
+                    className="flex w-full min-w-[160px] max-w-[280px] flex-1 sm:w-64"
+                  >
+                    <TopicCard topic={topic} />
+                  </div>
                 ))}
               </div>
             </section>
