@@ -21,7 +21,12 @@ export function SessionSummary({
 }: SessionSummaryProps) {
   const percentage = Math.round((correctCount / totalRounds) * 100);
   const isPerfect = correctCount === totalRounds;
-  
+
+  const handlePlayAgain = () => {
+    // Force a full page reload to bypass all client-side caching and get fresh rounds
+    window.location.href = `/topics/${topicId}/play`;
+  };
+
   // Calculate stars
   let stars = 1;
   if (percentage > 90) stars = 3;
@@ -49,24 +54,28 @@ export function SessionSummary({
         </div>
 
         <h1 className="animate-bounce-gentle mb-2 shrink-0 bg-gradient-to-r from-sky-600 via-blue-500 to-emerald-500 bg-clip-text text-center text-5xl font-black text-transparent drop-shadow-sm sm:mb-4 sm:text-6xl">
-          {isPerfect ? "Perfect!" : percentage > 60 ? "Great Job!" : "Good Try!"}
+          {isPerfect
+            ? "Perfect!"
+            : percentage > 60
+              ? "Great Job!"
+              : "Good Try!"}
         </h1>
 
         {/* Topic info */}
         <div className="mb-8 flex items-center gap-3 text-slate-700">
-          <span className="text-4xl filter drop-shadow-md">{topicIcon}</span>
+          <span className="text-4xl drop-shadow-md filter">{topicIcon}</span>
           <span className="text-2xl font-black">{topicName}</span>
         </div>
 
         {/* Score display */}
-        <div className="relative mb-10 w-full max-w-xs rounded-3xl bg-white p-8 text-center shadow-xl shadow-sky-100 ring-4 ring-white/50">
-           {/* Stars */}
-           <div className="absolute -top-6 left-1/2 flex -translate-x-1/2 gap-2">
+        <div className="relative mb-10 w-full max-w-xs rounded-3xl bg-white p-8 text-center shadow-xl ring-4 shadow-sky-100 ring-white/50">
+          {/* Stars */}
+          <div className="absolute -top-6 left-1/2 flex -translate-x-1/2 gap-2">
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
                 className={`flex h-12 w-12 items-center justify-center rounded-full border-4 border-white shadow-md transition-all duration-500 ${
-                  i <= stars ? "bg-amber-400 scale-110" : "bg-slate-200"
+                  i <= stars ? "scale-110 bg-amber-400" : "bg-slate-200"
                 }`}
                 style={{ transitionDelay: `${i * 150}ms` }}
               >
@@ -79,25 +88,26 @@ export function SessionSummary({
             ))}
           </div>
 
-          <div className="mt-4 mb-2 text-7xl font-black text-sky-600 sm:text-8xl tracking-tight">
+          <div className="mt-4 mb-2 text-7xl font-black tracking-tight text-sky-600 sm:text-8xl">
             {correctCount}
-            <span className="text-3xl text-slate-300 font-bold ml-1">/{totalRounds}</span>
+            <span className="ml-1 text-3xl font-bold text-slate-300">
+              /{totalRounds}
+            </span>
           </div>
-          <div className="text-lg font-bold text-slate-400 uppercase tracking-widest">
+          <div className="text-lg font-bold tracking-widest text-slate-400 uppercase">
             Correct
           </div>
         </div>
 
         {/* Action buttons */}
         <div className="flex w-full flex-col gap-4 sm:flex-row">
-          <Link
-            href={`/topics/${topicId}/play`}
-            prefetch={true}
+          <button
+            onClick={handlePlayAgain}
             className="group flex flex-1 items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-sky-500 to-blue-500 px-6 py-4 text-lg font-black text-white shadow-xl shadow-sky-500/30 transition-all hover:-translate-y-1 hover:scale-105 hover:shadow-2xl hover:shadow-sky-500/40 focus:ring-4 focus:ring-sky-500/30 focus:outline-none active:translate-y-1 active:scale-95"
           >
             <RefreshCw className="h-6 w-6 transition-transform group-hover:rotate-180" />
             Play Again
-          </Link>
+          </button>
 
           <Link
             href="/topics"
