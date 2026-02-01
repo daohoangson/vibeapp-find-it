@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { TopicCard } from "@/components";
 import { getTopicsByLevel, getLevelInfo, type TopicLevel } from "@/lib/topics";
 
 export const metadata: Metadata = {
@@ -68,22 +69,7 @@ export default function TopicsPage() {
               {/* Topic Cards Grid */}
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
                 {topics.map((topic) => (
-                  <Link
-                    key={topic.id}
-                    href={`/topics/${topic.id}`}
-                    prefetch={true}
-                    className="group rounded-2xl border-b-4 border-slate-200 bg-white p-4 shadow-md transition-all hover:-translate-y-1 hover:border-sky-300 hover:shadow-lg focus:ring-2 focus:ring-sky-500 focus:outline-none active:translate-y-0 sm:p-6"
-                  >
-                    <div className="mb-3 text-4xl sm:text-5xl">
-                      {topic.icon}
-                    </div>
-                    <h3 className="mb-1 font-bold text-slate-800 group-hover:text-sky-600 sm:text-lg">
-                      {topic.name}
-                    </h3>
-                    <p className="line-clamp-2 text-xs text-slate-500 sm:text-sm">
-                      {topic.description}
-                    </p>
-                  </Link>
+                  <TopicCard key={topic.id} topic={topic} />
                 ))}
               </div>
             </section>

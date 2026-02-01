@@ -59,7 +59,10 @@ export function GameScreen({
   const [speechAvailable, setSpeechAvailable] = useState(false);
 
   useEffect(() => {
-    setSpeechAvailable(isSpeechAvailable());
+    const timer = setTimeout(() => {
+      setSpeechAvailable(isSpeechAvailable());
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   // Announce the word when the game screen loads
