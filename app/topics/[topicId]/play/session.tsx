@@ -106,6 +106,7 @@ export default function TopicSession({
         items={items}
         type={round.type}
         onItemClick={handleItemClick}
+        backHref={`/topics/${topicId}`}
       />
     </div>
   );

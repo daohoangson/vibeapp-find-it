@@ -17,6 +17,7 @@ interface GameScreenProps {
   items: GameItem[];
   type: "color" | "emoji";
   onItemClick: (id: string) => void;
+  backHref?: string;
 }
 
 function CardContent({
@@ -50,6 +51,7 @@ export function GameScreen({
   items,
   type,
   onItemClick,
+  backHref = "/",
 }: GameScreenProps) {
   const hasCorrectAnswer = items.some((item) => item.status === "correct");
 
@@ -80,7 +82,7 @@ export function GameScreen({
       {/* Header */}
       <div className="z-20 flex w-full shrink-0 items-center justify-between px-4 py-4 sm:px-6">
         <Link
-          href="/"
+          href={backHref}
           prefetch={true}
           aria-label="Go back"
           className="rounded-full bg-white/80 p-3 text-slate-400 shadow-sm backdrop-blur-md transition-all hover:scale-105 hover:bg-white hover:text-sky-600 hover:shadow-md focus:ring-2 focus:ring-sky-500 focus:outline-none active:scale-95"
