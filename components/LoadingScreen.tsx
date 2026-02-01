@@ -1,8 +1,21 @@
 "use client";
 
+import { useState } from "react";
 import { Sparkles } from "lucide-react";
 
+const LOADING_PHRASES = [
+  "Looking for it...",
+  "Getting ready...",
+  "Let's see...",
+  "Almost there...",
+  "Here we go...",
+];
+
 export function LoadingScreen() {
+  const [phrase] = useState(
+    () => LOADING_PHRASES[Math.floor(Math.random() * LOADING_PHRASES.length)],
+  );
+
   return (
     <main
       className="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-sky-100 via-blue-50 to-emerald-50"
@@ -18,7 +31,7 @@ export function LoadingScreen() {
 
       <div className="flex flex-col items-center gap-2">
         <h2 className="animate-pulse text-3xl font-black tracking-tight text-slate-800">
-          Making magic...
+          {phrase}
         </h2>
         <div className="flex gap-2">
           <div className="h-3 w-3 animate-bounce rounded-full bg-sky-500 [animation-delay:-0.3s]" />
