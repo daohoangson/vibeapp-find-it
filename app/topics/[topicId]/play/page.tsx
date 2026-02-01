@@ -1,20 +1,19 @@
 import { notFound } from "next/navigation";
-import { getAllTopics, getTopicById } from "@/lib/topics";
+import { getTopicById } from "@/lib/topics";
 import {
   generateTopicSession,
   type RoundWithItems,
 } from "@/lib/topics/session";
 import TopicSession from "./session";
 
+// Force dynamic rendering so each play session gets fresh random words.
+// Without this, Next.js may cache the first request (Full Route Cache)
+// since generateTopicSession() is synchronous with no dynamic signals
+// (no cookies/headers/searchParams), causing "Play Again" to serve stale rounds.
+export const dynamic = "force-dynamic";
+
 interface PageProps {
   params: Promise<{ topicId: string }>;
-}
-
-export async function generateStaticParams() {
-  const topics = getAllTopics();
-  return topics.map((topic) => ({
-    topicId: topic.id,
-  }));
 }
 
 export type RoundData = RoundWithItems;
