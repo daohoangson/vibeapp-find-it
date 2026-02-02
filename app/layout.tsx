@@ -16,9 +16,9 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Find It! - Learning Game for Kids",
+  title: "3moji - The fun way to learn words",
   description:
-    "Interactive educational game where kids identify colors, shapes, and objects",
+    "Interactive educational game where kids find emojis matching the words.",
 };
 
 export default function RootLayout({

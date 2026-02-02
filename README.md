@@ -1,15 +1,13 @@
-# Find It! - Educational Learning Game for Kids
+# 3moji - Educational Learning Game for Kids
 
-An interactive web application for early childhood education where parents input concepts (colors, shapes, objects) and kids identify the matching visual representation from a set of options.
+An interactive web application for early childhood education where parents input words (colors, shapes, objects) and kids identify the matching visual representation.
 
 ## Features
 
-- **Dynamic Content Generation**: Local emoji/color database with LLM fallback for comprehensive coverage
-- **Age-Appropriate Rendering**: Solid color blocks for colors, large emojis for everything else
-- **Audio Feedback**: Web Audio API for success/error sounds (no external files needed)
-- **Text-to-Speech**: Announces the target word for pre-literate children
-- **Celebration Animations**: Canvas-based confetti particle system on success
-- **Multi-language Support**: Works with words in various languages
+- **Dynamic Content**: Uses LLM to generate appropriate emojis for any word
+- **Kid-Friendly UI**: Large touch targets, bright colors, no confusing menus
+- **Audio Feedback**: Success/Error sounds and Text-to-Speech
+- **PWA Support**: Installable on mobile devices for a native app experience
 
 ## How It Works
 

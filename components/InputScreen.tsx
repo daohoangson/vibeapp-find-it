@@ -46,7 +46,7 @@ export function InputScreen({
 
         <div className="mb-8 text-center">
           <h1 className="mb-3 text-5xl font-black tracking-tight text-slate-800 drop-shadow-sm">
-            Find It!
+            3moji
           </h1>
           <p className="text-lg font-medium text-slate-500">
             What should we look for today?
