@@ -15,6 +15,7 @@ import { execSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import moby from "moby";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -776,6 +777,82 @@ function buildEmojiDatabase(
       }
     }
   }
+
+  // =========================================================================
+  // PHASE 5: Moby-based keyword promotion
+  // =========================================================================
+  // For keywords that aren't already names, check if their moby synonyms
+  // match any of the emoji's existing names. This systematically promotes
+  // keywords like "sheep" when moby says sheep ↔ ewe (and "ewe" is a name).
+  //
+  // Also handles compound names: if keyword's synonym matches a word within
+  // the emoji's own compound TTS name (e.g., "juice" → "beverage" matches
+  // "beverage box" for 🧃).
+  // =========================================================================
+  console.log("  - Running moby-based keyword promotion...");
+  let mobyPromotions = 0;
+
+  for (const cat of database) {
+    if (isInternalCategory(cat.category)) continue;
+    for (const item of cat.items) {
+      const existingNames = new Set(item.names.map((n) => n.toLowerCase()));
+      const allKeywords = emojiToKeywordsMap.get(normalizeEmojiKey(item.emoji)) || [];
+
+      // Build set of words from this emoji's compound names (names with 2+ words)
+      const compoundNameWords = new Set<string>();
+      for (const name of item.names) {
+        const words = name.toLowerCase().split(/\s+/);
+        if (words.length >= 2) {
+          for (const word of words) {
+            if (word.length >= 3) {
+              compoundNameWords.add(word);
+            }
+          }
+        }
+      }
+
+      for (const keyword of allKeywords) {
+        const lowerKeyword = keyword.toLowerCase();
+        // Skip if already a name for this or any emoji
+        if (existingNames.has(lowerKeyword)) continue;
+        if (lowerKeyword in nameToEmoji) continue;
+
+        // Get moby synonyms for this keyword
+        const synonyms = moby.search(keyword) as string[] | null;
+        if (!synonyms) continue;
+
+        // Check if any synonym matches one of this emoji's names (exact match)
+        const synonymSet = new Set(synonyms.map((s) => s.toLowerCase().trim()));
+        let foundMatch = false;
+        for (const name of existingNames) {
+          if (synonymSet.has(name)) {
+            // The keyword's synonyms include this emoji's name
+            // So the keyword is semantically equivalent - promote it
+            nameToEmoji[lowerKeyword] = item.emoji;
+            mobyPromotions++;
+            foundMatch = true;
+            break;
+          }
+        }
+
+        // If no exact match, check if synonym matches a word in THIS emoji's compound names
+        if (!foundMatch && compoundNameWords.size > 0) {
+          for (const syn of synonyms) {
+            const lowerSyn = syn.toLowerCase().trim();
+            if (compoundNameWords.has(lowerSyn)) {
+              // The keyword's synonym is part of this emoji's compound name
+              nameToEmoji[lowerKeyword] = item.emoji;
+              mobyPromotions++;
+              foundMatch = true;
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  console.log(`  - Moby promotions: ${mobyPromotions} keywords promoted`);
 
   const shortestNames = new Set<string>();
   for (const cat of database) {

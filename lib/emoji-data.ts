@@ -4,7 +4,7 @@ import "server-only";
  * Emoji database API for generating game content without LLM.
  *
  * All lookup maps are pre-computed at build time by scripts/generate-emoji-data.ts.
- * This module just re-exports the data and provides the public API functions.
+ * This includes moby-based synonym expansion for common words.
  */
 import { shuffle } from "./shuffle";
 import {
@@ -36,17 +36,26 @@ const isInternalCategory = (category: string | null | undefined): boolean =>
 /**
  * Look up an emoji by name (case-insensitive)
  * Returns the FIRST emoji that matches (by definition order)
+ *
+ * The NAME_TO_EMOJI map includes:
+ * - Direct emoji names and TTS names
+ * - Keyword promotions (via moby synonym matching at generation time)
+ * - Common word expansions (via moby dominant-category at generation time)
  */
 export function findEmojiByName(
   name: string
 ): { emoji: string; category: string } | null {
   const normalized = normalizeName(name);
-  const emoji = NAME_TO_EMOJI[normalized];
-  if (!emoji) return null;
 
-  const category = EMOJI_TO_CATEGORY[normalizeEmoji(emoji)];
-  if (!category) return null;
-  return { emoji, category };
+  const emoji = NAME_TO_EMOJI[normalized];
+  if (emoji) {
+    const category = EMOJI_TO_CATEGORY[normalizeEmoji(emoji)];
+    if (category) {
+      return { emoji, category };
+    }
+  }
+
+  return null;
 }
 
 /**

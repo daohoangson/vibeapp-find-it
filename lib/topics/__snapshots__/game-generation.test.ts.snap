@@ -9,6 +9,7 @@ exports[`topic session generation (deterministic) > snapshot preview for animal-
   "cow -> 🐄 | distractors: 🐤, 🪽",
   "duck -> 🦆 | distractors: 🦬, 🐃",
   "rabbit -> 🐇 | distractors: 🦄, 🦃",
+  "sheep -> 🐏 | distractors: 🦤, 🐝",
   "pig -> 🐖 | distractors: 🦭, 🐋",
   "horse -> 🐎 | distractors: 🦬, 🐱",
 ]
@@ -62,12 +63,15 @@ exports[`topic session generation (deterministic) > snapshot preview for colors 
 exports[`topic session generation (deterministic) > snapshot preview for emotions 1`] = `
 [
   "worried -> 😟 | distractors: 😛, 🙂‍↔️",
-  "angry -> 😠 | distractors: 🤥, 💭",
-  "love -> 🏩 | distractors: 🎢, 🏚️",
-  "sad -> 😥 | distractors: 💛, 👺",
   "sleepy -> 😪 | distractors: 😠, 💝",
   "smiling -> ☺️ | distractors: ☠️, 💗",
+  "sad -> 😥 | distractors: 💛, 👺",
   "fearful -> 😨 | distractors: 💓, 😬",
+  "confused -> 😕 | distractors: 💜, 😮",
+  "thinking -> 🤔 | distractors: 😶, 💌",
+  "angry -> 😠 | distractors: 🤥, 💭",
+  "crying -> 😢 | distractors: 🤓, 🥶",
+  "love -> 🏩 | distractors: 🎢, 🏚️",
 ]
 `;
 
@@ -148,15 +152,16 @@ exports[`topic session generation (deterministic) > snapshot preview for profess
 
 exports[`topic session generation (deterministic) > snapshot preview for shapes 1`] = `
 [
-  "black circle -> ⚫ | distractors: 🔸, 🟡",
-  "blue square -> 🟦 | distractors: 🔴, 🟨",
-  "red square -> 🟥 | distractors: ⚪, 🟩",
-  "star -> ⭐ | distractors: 🌀, 🌌",
-  "square -> ▪️ | distractors: 🟨, 🟥",
   "white circle -> ⚪ | distractors: ⬛, ⚫",
   "diamond -> 🔷 | distractors: 🟦, ◼️",
+  "red square -> 🟥 | distractors: ⚪, 🟩",
+  "star -> ⭐ | distractors: 🌀, 🌌",
   "circle -> ⚫ | distractors: 🔸, 🟡",
   "triangle -> 🔺 | distractors: ⬛, 🟤",
+  "square -> ▪️ | distractors: 🟨, 🟥",
+  "black circle -> ⚫ | distractors: 🔸, 🟡",
+  "blue square -> 🟦 | distractors: 🔴, 🟨",
+  "red heart -> ❤️ | distractors: 🤣, 😔",
 ]
 `;
 

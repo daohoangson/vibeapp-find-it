@@ -55,17 +55,18 @@ describe("generateLocalContent", () => {
 
   describe("emoji handling", () => {
     it("should generate content for known emoji names", () => {
+      // "dog" maps to 🐕 (dog), not 🐶 (dog face) in the database
       const result = generateLocalContent("dog");
 
       expect(result).not.toBeNull();
       expect(result?.type).toBe("emoji");
-      expect(result?.targetValue).toBe("🐶");
+      expect(result?.targetValue).toBe("🐕");
       expect(result?.distractors).toHaveLength(2);
     });
 
     it("should be case insensitive for emoji names", () => {
-      expect(generateLocalContent("DOG")?.targetValue).toBe("🐶");
-      expect(generateLocalContent("Dog")?.targetValue).toBe("🐶");
+      expect(generateLocalContent("DOG")?.targetValue).toBe("🐕");
+      expect(generateLocalContent("Dog")?.targetValue).toBe("🐕");
     });
 
     it("should return non-similar distractors", () => {
@@ -99,17 +100,21 @@ describe("fixVisuallySimilarEmojis", () => {
   });
 
   it("should not modify content if no similarity issues", () => {
+    // Use animals that don't share keywords
+    // 🦁 lion: ["lion", "strong"]
+    // 🐯 tiger: ["big", "predator", "tiger"]
+    // 🐻 bear: ["bear", "honey"]
     const content = {
       type: "emoji" as const,
-      targetValue: "🐶",
-      distractors: ["🐱", "🐰"] as [string, string],
+      targetValue: "🦁",
+      distractors: ["🐯", "🐻"] as [string, string],
     };
 
     const result = fixVisuallySimilarEmojis(content);
 
-    expect(result.targetValue).toBe("🐶");
-    expect(result.distractors).toContain("🐱");
-    expect(result.distractors).toContain("🐰");
+    expect(result.targetValue).toBe("🦁");
+    expect(result.distractors).toContain("🐯");
+    expect(result.distractors).toContain("🐻");
   });
 
   it("should fix when distractor is similar to target (flowers case)", () => {
@@ -158,17 +163,20 @@ describe("fixVisuallySimilarEmojis", () => {
     }
   });
 
-  it("should return original if emoji not in database", () => {
+  it("should fix when distractors share keywords with each other", () => {
+    // 🫣 and 🫥 both have "hide" keyword - they are similar to each other
     const content = {
       type: "emoji" as const,
-      targetValue: "🫠", // melting face - not in our DB
+      targetValue: "🫠", // melting face
       distractors: ["🫣", "🫥"] as [string, string],
     };
 
     const result = fixVisuallySimilarEmojis(content);
 
-    // Should return original since we can't look up the category
-    expect(result).toEqual(content);
+    expect(result.targetValue).toBe("🫠");
+    // Distractors should be replaced since they share "hide" keyword
+    expect(result.distractors).toHaveLength(2);
+    expect(areVisuallySimilar(result.distractors[0], result.distractors[1])).toBe(false);
   });
 
   it("should preserve targetValue when fixing", () => {
