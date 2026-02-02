@@ -116,7 +116,7 @@ export function GameScreen({
               onClick={() => onItemClick(item.id)}
               disabled={isWrong || hasCorrectAnswer}
               aria-label={`Option: ${item.value}`}
-              className={`relative min-h-0 min-w-0 flex-1 transform overflow-hidden rounded-3xl border-b-[8px] transition-all duration-300 focus:outline-none sm:rounded-[2.5rem] sm:border-b-[12px] ${
+              className={`relative min-h-0 min-w-0 flex-1 transform overflow-hidden rounded-3xl border-b-[8px] touch-manipulation transition-all duration-300 focus:outline-none sm:rounded-[2.5rem] sm:border-b-[12px] ${
                 !isWrong && !isCorrect
                   ? "border-slate-200 bg-white shadow-xl"
                   : ""

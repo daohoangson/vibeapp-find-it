@@ -16,6 +16,10 @@ body {
   background-color: var(--color-brand-background);
   color: var(--color-brand-text);
   font-family: var(--font-sans);
+  overscroll-behavior-y: none;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 @keyframes bounce-gentle {
