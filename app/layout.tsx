@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
+import Script from "next/script";
 import { SoundToggle } from "@/components/SoundToggle";
 import { KeyboardHelp } from "@/components/KeyboardHelp";
 import "./globals.css";
@@ -31,6 +32,19 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} font-sans antialiased`}>
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-X8B5CLPKL4"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-X8B5CLPKL4');
+          `}
+        </Script>
         <div className="fixed top-4 right-4 z-50">
           <SoundToggle />
         </div>
