@@ -42,8 +42,8 @@ An interactive web application for early childhood education where parents input
 
 ```bash
 # Clone the repository
-git clone https://github.com/daohoangson/find-it-app.git
-cd find-it-app
+git clone https://github.com/daohoangson/3moji.git
+cd 3moji
 
 # Install dependencies
 npm install
