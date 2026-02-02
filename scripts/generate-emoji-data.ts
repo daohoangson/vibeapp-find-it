@@ -72,8 +72,104 @@ interface EmojiCategory {
 
 interface PromotionCandidate {
   emoji: string;
-  ttsLength: number;
-  isExact: boolean;
+  tts: string;
+  isInflectionMatch: boolean; // "cherry" matches "cherries" via inflection
+  isLastWord: boolean; // keyword is the last word of compound TTS
+  modifierRank: number; // word frequency rank of modifier (lower = more common)
+}
+
+// =============================================================================
+// Inflection helpers for English singular/plural matching
+// =============================================================================
+// "cherries" → "cherry", "cars" → "car", etc.
+// This allows "cherry" to match 🍒 "cherries" as an exact match.
+// =============================================================================
+
+function getSingularForms(word: string): string[] {
+  const lower = word.toLowerCase();
+  const forms = [lower];
+
+  // cherries → cherry
+  if (lower.endsWith("ies") && lower.length > 3) {
+    forms.push(lower.slice(0, -3) + "y");
+  }
+  // buses → bus, boxes → box
+  if (lower.endsWith("es") && lower.length > 2) {
+    forms.push(lower.slice(0, -2));
+  }
+  // cars → car (but not "glass" → "glas")
+  if (lower.endsWith("s") && !lower.endsWith("ss") && lower.length > 1) {
+    forms.push(lower.slice(0, -1));
+  }
+
+  return forms;
+}
+
+function getPluralForms(word: string): string[] {
+  const lower = word.toLowerCase();
+  const forms = [lower];
+
+  // cherry → cherries (consonant + y)
+  if (/[^aeiou]y$/.test(lower)) {
+    forms.push(lower.slice(0, -1) + "ies");
+  }
+  // bus → buses
+  if (/(?:s|x|z|ch|sh)$/.test(lower)) {
+    forms.push(lower + "es");
+  }
+  // car → cars
+  forms.push(lower + "s");
+
+  return forms;
+}
+
+function areInflectedForms(word1: string, word2: string): boolean {
+  const lower1 = word1.toLowerCase();
+  const lower2 = word2.toLowerCase();
+  if (lower1 === lower2) return true;
+
+  const forms1 = new Set([...getSingularForms(lower1), ...getPluralForms(lower1)]);
+  const forms2 = new Set([...getSingularForms(lower2), ...getPluralForms(lower2)]);
+
+  for (const form of forms1) {
+    if (forms2.has(form)) return true;
+  }
+  return false;
+}
+
+// =============================================================================
+// Word frequency data for modifier ranking
+// =============================================================================
+// When multiple compound TTS names compete (e.g., "birthday cake" vs "moon cake"),
+// prefer the one with more common modifier word.
+// Source: https://github.com/first20hours/google-10000-english
+// Lower rank = more common word. Words not in list get rank 99999.
+// =============================================================================
+
+const WORD_FREQUENCY_URL =
+  "https://raw.githubusercontent.com/first20hours/google-10000-english/master/google-10000-english.txt";
+
+let wordFrequencyRank: Map<string, number> | null = null;
+
+async function loadWordFrequency(): Promise<Map<string, number>> {
+  if (wordFrequencyRank) return wordFrequencyRank;
+
+  const text = await fetchTextCached(WORD_FREQUENCY_URL, "google-10000-english.txt");
+  const lines = text.split(/\r?\n/).filter(Boolean);
+
+  wordFrequencyRank = new Map();
+  for (let i = 0; i < lines.length; i++) {
+    const word = lines[i].trim().toLowerCase();
+    if (word) {
+      wordFrequencyRank.set(word, i + 1); // 1-indexed rank
+    }
+  }
+
+  return wordFrequencyRank;
+}
+
+function getWordRank(word: string, ranks: Map<string, number>): number {
+  return ranks.get(word.toLowerCase()) ?? 99999;
 }
 
 // =============================================================================
@@ -395,7 +491,8 @@ interface BuildResult {
 
 function buildEmojiDatabase(
   entries: EmojiTestEntry[],
-  localeData: Record<string, LocaleData>
+  localeData: Record<string, LocaleData>,
+  wordRanks: Map<string, number>
 ): BuildResult {
   const categories = new Map<string, EmojiItem[]>();
   const seen = new Set<string>();
@@ -472,27 +569,46 @@ function buildEmojiDatabase(
     // If a keyword appears in the emoji's TTS name, it's a promotion candidate.
     // e.g., 🐶 TTS="dog face", keyword="dog" → "dog" is candidate
     const englishTts = getEnglishName(localeData["en"], entry.emoji) || "";
-    const ttsWords = new Set(
-      englishTts
-        .toLowerCase()
-        .split(/[^a-z0-9]+/)
-        .filter(Boolean)
-    );
+    const ttsWordsArray = englishTts
+      .toLowerCase()
+      .split(/[^a-z0-9]+/)
+      .filter(Boolean);
+    const ttsWords = new Set(ttsWordsArray);
     const allKeywords = collectLocaleKeywords(localeData["en"], entry.emoji);
+    const lastTtsWord = ttsWordsArray[ttsWordsArray.length - 1] || "";
 
     for (const keyword of allKeywords) {
       const lowerKeyword = keyword.toLowerCase();
-      const isExact = englishTts.toLowerCase() === lowerKeyword;
+
+      // Check for exact match (with inflection support)
+      // "cherry" matches "cherries" as inflection match
+      const isInflectionMatch = areInflectedForms(lowerKeyword, englishTts);
       const inTts = ttsWords.has(lowerKeyword);
 
-      if (isExact || inTts) {
+      if (isInflectionMatch || inTts) {
+        // Check if keyword is the last word of compound TTS
+        // "cake" is last word in "birthday cake" but not in "cakewalk"
+        const isLastWord = areInflectedForms(lowerKeyword, lastTtsWord);
+
+        // Get modifier word rank for compound TTS names
+        // For "birthday cake", modifier is "birthday"
+        // For "person bouncing ball", modifier is "bouncing" (word before "ball")
+        let modifierRank = 99999;
+        if (ttsWordsArray.length >= 2 && isLastWord) {
+          // Get rank of the word immediately before the last word
+          const modifier = ttsWordsArray[ttsWordsArray.length - 2];
+          modifierRank = getWordRank(modifier, wordRanks);
+        }
+
         if (!promotionCandidates.has(lowerKeyword)) {
           promotionCandidates.set(lowerKeyword, []);
         }
         promotionCandidates.get(lowerKeyword)!.push({
           emoji: entry.emoji,
-          ttsLength: englishTts.length,
-          isExact,
+          tts: englishTts,
+          isInflectionMatch,
+          isLastWord,
+          modifierRank,
         });
       }
     }
@@ -501,22 +617,39 @@ function buildEmojiDatabase(
   // =========================================================================
   // PHASE 2: Pick one winner per keyword
   // =========================================================================
-  // When multiple emojis want the same keyword (e.g., "star" wanted by both
-  // ⭐ "star" and 🤩 "star-struck"), we need a deterministic tiebreaker:
+  // When multiple emojis want the same keyword, we use these tiebreakers:
   //
-  // 1. Exact TTS match wins (⭐ TTS is exactly "star")
-  // 2. Shorter TTS wins (more specific emoji, less compound)
+  // 1. Inflection match wins (🍒 "cherries" beats 🌸 "cherry blossom" for "cherry")
+  // 2. Last word match wins (keyword is the head noun of compound)
+  // 3. More common modifier wins (🎂 "birthday cake" beats 🥮 "moon cake")
+  // 4. Shorter TTS wins (more specific emoji)
   //
-  // This ensures ⭐ gets "star", not 🤩, regardless of processing order.
+  // This ensures deterministic, intuitive mappings without manual overrides.
   // =========================================================================
   const keywordWinners = new Map<string, string>();
 
-  for (const [keyword, candidates] of promotionCandidates) {
+  for (const [, candidates] of promotionCandidates) {
     candidates.sort((a, b) => {
-      if (a.isExact && !b.isExact) return -1;
-      if (!a.isExact && b.isExact) return 1;
-      return a.ttsLength - b.ttsLength;
+      // 1. Inflection match wins (cherry ↔ cherries counts as exact)
+      if (a.isInflectionMatch && !b.isInflectionMatch) return -1;
+      if (!a.isInflectionMatch && b.isInflectionMatch) return 1;
+
+      // 2. Last word match wins (keyword is head noun of compound)
+      if (a.isLastWord && !b.isLastWord) return -1;
+      if (!a.isLastWord && b.isLastWord) return 1;
+
+      // 3. More common modifier wins (lower rank = more common)
+      if (a.modifierRank !== b.modifierRank) {
+        return a.modifierRank - b.modifierRank;
+      }
+
+      // 4. Shorter TTS wins (more specific emoji)
+      return a.tts.length - b.tts.length;
     });
+  }
+
+  // Now set the winners using the original keywords
+  for (const [keyword, candidates] of promotionCandidates) {
     keywordWinners.set(keyword, candidates[0].emoji);
   }
 
@@ -740,7 +873,8 @@ async function main(): Promise<void> {
     };
   }
 
-  const result = buildEmojiDatabase(entries, localeData);
+  const wordRanks = await loadWordFrequency();
+  const result = buildEmojiDatabase(entries, localeData, wordRanks);
   writeOutput(result);
 
   execSync(`npx prettier --write "${OUTPUT_PATH}"`, { stdio: "inherit" });
