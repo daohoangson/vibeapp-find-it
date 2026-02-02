@@ -70,7 +70,6 @@ export default function Icon() {
               textShadow: "0 0 60px white, 0 0 30px white",
               filter: "drop-shadow(0 12px 24px rgba(0,0,0,0.2))",
               transform: "scale(1.1)",
-              zIndex: 10,
             }}
           >
             🧐
