@@ -105,7 +105,7 @@ export function SessionSummary({
         <div className="flex w-full flex-col gap-4 sm:flex-row">
           <button
             onClick={handlePlayAgain}
-            className="group flex flex-1 items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-sky-500 to-blue-500 px-6 py-4 text-lg font-black text-white shadow-xl shadow-sky-500/30 transition-all hover:-translate-y-1 hover:scale-105 hover:shadow-2xl hover:shadow-sky-500/40 focus:ring-4 focus:ring-sky-500/30 focus:outline-none active:translate-y-1 active:scale-95"
+            className="group flex flex-1 items-center justify-center gap-3 touch-manipulation rounded-2xl bg-gradient-to-r from-sky-500 to-blue-500 px-6 py-4 text-lg font-black text-white shadow-xl shadow-sky-500/30 transition-all hover:-translate-y-1 hover:scale-105 hover:shadow-2xl hover:shadow-sky-500/40 focus:ring-4 focus:ring-sky-500/30 focus:outline-none active:translate-y-1 active:scale-95"
           >
             <RefreshCw className="h-6 w-6 transition-transform group-hover:rotate-180" />
             Play Again
@@ -115,7 +115,7 @@ export function SessionSummary({
             href="/topics"
             prefetch={true}
             onClick={() => playPopSound()}
-            className="group flex flex-1 items-center justify-center gap-3 rounded-2xl bg-white px-6 py-4 text-lg font-black text-slate-700 shadow-lg ring-1 ring-slate-200 transition-all hover:-translate-y-1 hover:scale-105 hover:shadow-xl focus:ring-4 focus:ring-slate-500/30 focus:outline-none active:translate-y-1 active:scale-95"
+            className="group flex flex-1 items-center justify-center gap-3 touch-manipulation rounded-2xl bg-white px-6 py-4 text-lg font-black text-slate-700 shadow-lg ring-1 ring-slate-200 transition-all hover:-translate-y-1 hover:scale-105 hover:shadow-xl focus:ring-4 focus:ring-slate-500/30 focus:outline-none active:translate-y-1 active:scale-95"
           >
             <Home className="h-6 w-6" />
             All Topics

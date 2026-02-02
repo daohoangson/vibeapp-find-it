@@ -64,7 +64,7 @@ export default function HomeClient({
               href="/topics"
               prefetch={true}
               onClick={() => playPopSound()}
-              className="flex items-center gap-1 text-sm font-bold text-sky-600 transition-colors hover:text-sky-700"
+              className="flex items-center gap-1 touch-manipulation text-sm font-bold text-sky-600 transition-colors hover:text-sky-700"
             >
               See All
               <ChevronRight className="h-4 w-4" />
@@ -94,7 +94,7 @@ export default function HomeClient({
                   playPopSound();
                   unlockAudio();
                 }}
-                className={`rounded-xl px-4 py-2 text-sm font-bold transition-all hover:-translate-y-1 hover:shadow-md active:translate-y-0 ${
+                className={`rounded-2xl px-4 py-2 touch-manipulation text-sm font-bold transition-all hover:-translate-y-1 hover:shadow-md active:translate-y-0 ${
                   i % 3 === 0
                     ? "bg-sky-100 text-sky-700 hover:bg-sky-200"
                     : i % 3 === 1
@@ -125,7 +125,7 @@ export default function HomeClient({
             <button
               type="submit"
               disabled={!inputWord.trim()}
-              className="group relative flex w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 py-4 text-lg font-black text-white shadow-xl shadow-sky-500/30 transition-all hover:scale-[1.02] hover:shadow-2xl hover:shadow-sky-500/40 focus:ring-4 focus:ring-sky-500/30 focus:outline-none active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none sm:rounded-2xl sm:py-5 sm:text-xl"
+              className="group relative flex w-full items-center justify-center gap-3 touch-manipulation rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 py-4 text-lg font-black text-white shadow-xl shadow-sky-500/30 transition-all hover:scale-[1.02] hover:shadow-2xl hover:shadow-sky-500/40 focus:ring-4 focus:ring-sky-500/30 focus:outline-none active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none sm:rounded-2xl sm:py-5 sm:text-xl"
             >
               <span className="drop-shadow-md">Let&apos;s Play!</span>
               <ArrowRight className="h-6 w-6 stroke-[3px] transition-transform group-hover:translate-x-1 sm:h-7 sm:w-7" />
