@@ -16,6 +16,10 @@ body {
   background-color: var(--color-brand-background);
   color: var(--color-brand-text);
   font-family: var(--font-sans);
+  overscroll-behavior-y: none;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 @keyframes bounce-gentle {
@@ -30,8 +34,77 @@ body {
   }
 }
 
-.animate-bounce-gentle {
-  animation: bounce-gentle 2s infinite;
+@keyframes shake-card {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  15% {
+    transform: translate3d(-5px, 0, 0) rotate(-2deg);
+  }
+  30% {
+    transform: translate3d(5px, 0, 0) rotate(2deg);
+  }
+  45% {
+    transform: translate3d(-3px, 0, 0) rotate(-1deg);
+  }
+  60% {
+    transform: translate3d(3px, 0, 0) rotate(1deg);
+  }
+  75% {
+    transform: translate3d(-1px, 0, 0) rotate(0deg);
+  }
+}
+
+@keyframes pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  70% {
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .animate-bounce-gentle {
+    animation: bounce-gentle 2s infinite;
+  }
+
+  .animate-shake {
+    animation: shake-card 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  }
+
+  .animate-pop-in {
+    animation: pop-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-bounce-gentle {
+    animation: none;
+  }
+
+  .animate-shake {
+    animation: none;
+  }
+
+  .animate-pop-in {
+    animation: fade-in 0.5s ease-out backwards;
+  }
 }
 
 .animate-pulse-slow {

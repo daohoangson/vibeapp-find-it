@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Sparkles, ArrowRight, Search } from "lucide-react";
-import { unlockAudio } from "@/lib/audio";
+import { unlockAudio, playPopSound } from "@/lib/audio";
 
 interface InputScreenProps {
   inputWord: string;
@@ -23,8 +23,14 @@ export function InputScreen({
 }: InputScreenProps) {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && inputWord.trim() && !isLoading) {
+      playPopSound();
       onStart();
     }
+  };
+
+  const handleStart = () => {
+    playPopSound();
+    onStart();
   };
 
   return (
@@ -46,7 +52,7 @@ export function InputScreen({
 
         <div className="mb-8 text-center">
           <h1 className="mb-3 text-5xl font-black tracking-tight text-slate-800 drop-shadow-sm">
-            Find It!
+            3moji
           </h1>
           <p className="text-lg font-medium text-slate-500">
             What should we look for today?
@@ -60,8 +66,11 @@ export function InputScreen({
               key={word}
               href={`/find/${encodeURIComponent(word)}`}
               prefetch={true}
-              onClick={() => unlockAudio()}
-              className={`group relative overflow-hidden rounded-2xl px-5 py-2.5 text-sm font-bold transition-all hover:-translate-y-1 hover:shadow-md active:translate-y-0 ${
+              onClick={() => {
+                unlockAudio();
+                playPopSound();
+              }}
+              className={`group relative touch-manipulation overflow-hidden rounded-2xl px-5 py-2.5 text-sm font-bold transition-all hover:-translate-y-1 hover:shadow-md active:translate-y-0 ${
                 isLoading ? "pointer-events-none opacity-50" : ""
               } ${
                 i % 3 === 0
@@ -87,7 +96,7 @@ export function InputScreen({
               onChange={(e) => onInputChange(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Type a word..."
-              className="w-full rounded-2xl border-4 border-slate-100 bg-slate-50 py-5 pr-4 pl-14 text-2xl font-bold text-slate-800 placeholder-slate-300 transition-all hover:border-sky-200 focus:border-sky-500 focus:bg-white focus:ring-4 focus:ring-sky-500/20 focus:outline-none"
+              className="w-full rounded-2xl border-4 border-slate-100 bg-slate-50 py-5 pr-4 pl-14 text-2xl font-bold text-slate-800 placeholder-slate-300 transition-all select-text hover:border-sky-200 focus:border-sky-500 focus:bg-white focus:ring-4 focus:ring-sky-500/20 focus:outline-none"
               autoFocus
               disabled={isLoading}
             />
@@ -103,9 +112,9 @@ export function InputScreen({
           )}
 
           <button
-            onClick={onStart}
+            onClick={handleStart}
             disabled={!inputWord.trim() || isLoading}
-            className="group relative flex w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 py-5 text-xl font-black text-white shadow-xl shadow-sky-500/30 transition-all hover:scale-[1.02] hover:shadow-2xl hover:shadow-sky-500/40 focus:ring-4 focus:ring-sky-500/30 focus:outline-none active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
+            className="group relative flex w-full cursor-pointer touch-manipulation items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 py-5 text-xl font-black text-white shadow-xl shadow-sky-500/30 transition-all hover:scale-[1.02] hover:shadow-2xl hover:shadow-sky-500/40 focus:ring-4 focus:ring-sky-500/30 focus:outline-none active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
           >
             <span className="drop-shadow-md">Let&apos;s Play!</span>
             <ArrowRight className="h-7 w-7 stroke-[3px] transition-transform group-hover:translate-x-1" />
