@@ -157,7 +157,7 @@ describe("getShortestEmojiNames", () => {
 
     // Should include short names
     expect(names).toContain("dog"); // not "dog face"
-    expect(names).toContain("flower"); // not "cherry blossom" for 🌸
+    expect(names).toContain("rose"); // shortest name for 🌹
   });
 
   it("should return many unique names", () => {

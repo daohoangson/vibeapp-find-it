@@ -16,6 +16,14 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import moby from "moby";
+import winkNLP from "wink-nlp";
+import model from "wink-eng-lite-web-model";
+import vectors from "wink-embeddings-sg-100d";
+// @ts-expect-error - wink-nlp types don't export similarity
+import similarity from "wink-nlp/utilities/similarity.js";
+
+// Initialize wink-nlp with word embeddings
+const nlp = winkNLP(model, [], vectors);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -74,103 +82,63 @@ interface EmojiCategory {
 interface PromotionCandidate {
   emoji: string;
   tts: string;
-  isInflectionMatch: boolean; // "cherry" matches "cherries" via inflection
-  isLastWord: boolean; // keyword is the last word of compound TTS
-  modifierRank: number; // word frequency rank of modifier (lower = more common)
+  isNameMatch: boolean; // keyword exactly matches one of emoji's names
+  synonymScore: number; // semantic similarity between keyword and TTS (0-1)
 }
 
 // =============================================================================
-// Inflection helpers for English singular/plural matching
+// Semantic similarity using wink-nlp word embeddings
 // =============================================================================
-// "cherries" → "cherry", "cars" → "car", etc.
-// This allows "cherry" to match 🍒 "cherries" as an exact match.
-// =============================================================================
-
-function getSingularForms(word: string): string[] {
-  const lower = word.toLowerCase();
-  const forms = [lower];
-
-  // cherries → cherry
-  if (lower.endsWith("ies") && lower.length > 3) {
-    forms.push(lower.slice(0, -3) + "y");
-  }
-  // buses → bus, boxes → box
-  if (lower.endsWith("es") && lower.length > 2) {
-    forms.push(lower.slice(0, -2));
-  }
-  // cars → car (but not "glass" → "glas")
-  if (lower.endsWith("s") && !lower.endsWith("ss") && lower.length > 1) {
-    forms.push(lower.slice(0, -1));
-  }
-
-  return forms;
-}
-
-function getPluralForms(word: string): string[] {
-  const lower = word.toLowerCase();
-  const forms = [lower];
-
-  // cherry → cherries (consonant + y)
-  if (/[^aeiou]y$/.test(lower)) {
-    forms.push(lower.slice(0, -1) + "ies");
-  }
-  // bus → buses
-  if (/(?:s|x|z|ch|sh)$/.test(lower)) {
-    forms.push(lower + "es");
-  }
-  // car → cars
-  forms.push(lower + "s");
-
-  return forms;
-}
-
-function areInflectedForms(word1: string, word2: string): boolean {
-  const lower1 = word1.toLowerCase();
-  const lower2 = word2.toLowerCase();
-  if (lower1 === lower2) return true;
-
-  const forms1 = new Set([...getSingularForms(lower1), ...getPluralForms(lower1)]);
-  const forms2 = new Set([...getSingularForms(lower2), ...getPluralForms(lower2)]);
-
-  for (const form of forms1) {
-    if (forms2.has(form)) return true;
-  }
-  return false;
-}
-
-// =============================================================================
-// Word frequency data for modifier ranking
-// =============================================================================
-// When multiple compound TTS names compete (e.g., "birthday cake" vs "moon cake"),
-// prefer the one with more common modifier word.
-// Source: https://github.com/first20hours/google-10000-english
-// Lower rank = more common word. Words not in list get rank 99999.
+// Problem: CLDR keywords like "car" don't always match emoji TTS names exactly.
+// For example, 🚗 has TTS "automobile" but users search for "car".
+//
+// Solution: Use word embeddings to compute semantic similarity between keywords
+// and TTS names. Words with similar meanings (car ↔ automobile) get high scores.
+//
+// Trade-off: Embeddings favor word overlap, so "cherry blossom" scores higher
+// than "cherries" for the keyword "cherry". This is a known limitation.
+//
+// Technical: Uses wink-nlp's 100D embeddings with cosine similarity.
+// For phrases, we average word vectors to get a single phrase vector.
 // =============================================================================
 
-const WORD_FREQUENCY_URL =
-  "https://raw.githubusercontent.com/first20hours/google-10000-english/master/google-10000-english.txt";
+function getWordVector(text: string): number[] | null {
+  // Try single word first
+  const singleVec = nlp.vectorOf(text);
+  if (singleVec && singleVec.length > 0 && singleVec.some((v: number) => v !== 0)) {
+    return singleVec;
+  }
 
-let wordFrequencyRank: Map<string, number> | null = null;
+  // For phrases, average word vectors
+  const doc = nlp.readDoc(text);
+  const tokens = doc.tokens();
+  const wordVectors: number[][] = [];
 
-async function loadWordFrequency(): Promise<Map<string, number>> {
-  if (wordFrequencyRank) return wordFrequencyRank;
+  tokens.each((token: { out: () => string }) => {
+    const vec = nlp.vectorOf(token.out());
+    if (vec && vec.length > 0 && vec.some((v: number) => v !== 0)) {
+      wordVectors.push(vec);
+    }
+  });
 
-  const text = await fetchTextCached(WORD_FREQUENCY_URL, "google-10000-english.txt");
-  const lines = text.split(/\r?\n/).filter(Boolean);
+  if (wordVectors.length === 0) return null;
 
-  wordFrequencyRank = new Map();
-  for (let i = 0; i < lines.length; i++) {
-    const word = lines[i].trim().toLowerCase();
-    if (word) {
-      wordFrequencyRank.set(word, i + 1); // 1-indexed rank
+  // Average the vectors
+  const dim = wordVectors[0].length;
+  const avg = new Array(dim).fill(0);
+  for (const vec of wordVectors) {
+    for (let i = 0; i < dim; i++) {
+      avg[i] += vec[i] / wordVectors.length;
     }
   }
-
-  return wordFrequencyRank;
+  return avg;
 }
 
-function getWordRank(word: string, ranks: Map<string, number>): number {
-  return ranks.get(word.toLowerCase()) ?? 99999;
+function semanticSimilarity(word1: string, word2: string): number {
+  const vec1 = getWordVector(word1);
+  const vec2 = getWordVector(word2);
+  if (!vec1 || !vec2) return 0;
+  return similarity.vector.cosine(vec1, vec2) as number;
 }
 
 // =============================================================================
@@ -492,8 +460,7 @@ interface BuildResult {
 
 function buildEmojiDatabase(
   entries: EmojiTestEntry[],
-  localeData: Record<string, LocaleData>,
-  wordRanks: Map<string, number>
+  localeData: Record<string, LocaleData>
 ): BuildResult {
   const categories = new Map<string, EmojiItem[]>();
   const seen = new Set<string>();
@@ -567,49 +534,52 @@ function buildEmojiDatabase(
       }
     }
 
-    // If a keyword appears in the emoji's TTS name, it's a promotion candidate.
-    // e.g., 🐶 TTS="dog face", keyword="dog" → "dog" is candidate
+    // Skip internal categories (e.g., "internal:family") for keyword promotion.
+    // These emojis are hidden from users in the app, so promoting their keywords
+    // would cause words like "love" to map to 💏 (kiss) which is in internal:family,
+    // instead of visible emojis like 🏩 (love hotel) or 💌 (love letter).
+    const category = mapCategory(entry.group, entry.subgroup);
+    if (isInternalCategory(category)) {
+      continue; // Still counted words above, but don't promote keywords
+    }
+
     const englishTts = getEnglishName(localeData["en"], entry.emoji) || "";
-    const ttsWordsArray = englishTts
-      .toLowerCase()
-      .split(/[^a-z0-9]+/)
-      .filter(Boolean);
-    const ttsWords = new Set(ttsWordsArray);
     const allKeywords = collectLocaleKeywords(localeData["en"], entry.emoji);
-    const lastTtsWord = ttsWordsArray[ttsWordsArray.length - 1] || "";
+
+    // Collect all existing names for this emoji (for isNameMatch check)
+    const existingNames = new Set<string>();
+    for (const locale of LOCALES) {
+      for (const name of collectLocaleNames(localeData[locale], entry.emoji)) {
+        existingNames.add(name.toLowerCase());
+      }
+    }
 
     for (const keyword of allKeywords) {
       const lowerKeyword = keyword.toLowerCase();
+      // Check if keyword exactly matches one of emoji's existing names
+      const isNameMatch = existingNames.has(lowerKeyword);
 
-      // Check for exact match (with inflection support)
-      // "cherry" matches "cherries" as inflection match
-      const isInflectionMatch = areInflectedForms(lowerKeyword, englishTts);
-      const inTts = ttsWords.has(lowerKeyword);
+      // Compute semantic similarity between keyword and TTS name.
+      // This allows keyword promotion even when words don't match exactly:
+      // - "car" → 🚗 "automobile" (synonyms)
+      // - "cherry" → 🍒 "cherries" (inflection)
+      // - "clover" → 🍀 "four leaf clover" (phrase containing word)
+      const synonymScore = semanticSimilarity(lowerKeyword, englishTts.toLowerCase());
 
-      if (isInflectionMatch || inTts) {
-        // Check if keyword is the last word of compound TTS
-        // "cake" is last word in "birthday cake" but not in "cakewalk"
-        const isLastWord = areInflectedForms(lowerKeyword, lastTtsWord);
-
-        // Get modifier word rank for compound TTS names
-        // For "birthday cake", modifier is "birthday"
-        // For "person bouncing ball", modifier is "bouncing" (word before "ball")
-        let modifierRank = 99999;
-        if (ttsWordsArray.length >= 2 && isLastWord) {
-          // Get rank of the word immediately before the last word
-          const modifier = ttsWordsArray[ttsWordsArray.length - 2];
-          modifierRank = getWordRank(modifier, wordRanks);
-        }
-
+      // Threshold tuned empirically:
+      // - 0.45 accepts "clover" ↔ "four leaf clover" (0.49)
+      // - Lower values accept more candidates but risk false positives
+      // - Higher values miss valid matches like cherry ↔ cherries (0.55)
+      const SYNONYM_THRESHOLD = 0.45;
+      if (synonymScore >= SYNONYM_THRESHOLD) {
         if (!promotionCandidates.has(lowerKeyword)) {
           promotionCandidates.set(lowerKeyword, []);
         }
         promotionCandidates.get(lowerKeyword)!.push({
           emoji: entry.emoji,
           tts: englishTts,
-          isInflectionMatch,
-          isLastWord,
-          modifierRank,
+          isNameMatch,
+          synonymScore,
         });
       }
     }
@@ -618,33 +588,33 @@ function buildEmojiDatabase(
   // =========================================================================
   // PHASE 2: Pick one winner per keyword
   // =========================================================================
-  // When multiple emojis want the same keyword, we use these tiebreakers:
+  // When multiple emojis compete for the same keyword, we need deterministic
+  // tiebreakers. For example, "cake" appears in both "birthday cake" 🎂 and
+  // "moon cake" 🥮 - which one should "cake" map to?
   //
-  // 1. Inflection match wins (🍒 "cherries" beats 🌸 "cherry blossom" for "cherry")
-  // 2. Last word match wins (keyword is the head noun of compound)
-  // 3. More common modifier wins (🎂 "birthday cake" beats 🥮 "moon cake")
-  // 4. Shorter TTS wins (more specific emoji)
+  // Ranking criteria (in priority order):
+  // 1. Name match wins - if keyword is already an emoji's name, that's exact
+  // 2. Higher synonym score wins - semantic similarity as computed by embeddings
+  // 3. Shorter TTS wins - "automobile" (11 chars) beats "police car" (10 chars)
   //
-  // This ensures deterministic, intuitive mappings without manual overrides.
+  // Note: We previously tried inflection matching (cherry ↔ cherries) and
+  // modifier frequency ranking, but semantic similarity handles most cases
+  // and keeps the code simpler.
   // =========================================================================
   const keywordWinners = new Map<string, string>();
 
   for (const [, candidates] of promotionCandidates) {
     candidates.sort((a, b) => {
-      // 1. Inflection match wins (cherry ↔ cherries counts as exact)
-      if (a.isInflectionMatch && !b.isInflectionMatch) return -1;
-      if (!a.isInflectionMatch && b.isInflectionMatch) return 1;
+      // 1. Name match wins (keyword is already one of emoji's names)
+      if (a.isNameMatch && !b.isNameMatch) return -1;
+      if (!a.isNameMatch && b.isNameMatch) return 1;
 
-      // 2. Last word match wins (keyword is head noun of compound)
-      if (a.isLastWord && !b.isLastWord) return -1;
-      if (!a.isLastWord && b.isLastWord) return 1;
-
-      // 3. More common modifier wins (lower rank = more common)
-      if (a.modifierRank !== b.modifierRank) {
-        return a.modifierRank - b.modifierRank;
+      // 2. Higher synonym score wins (car ↔ automobile via semantic similarity)
+      if (a.synonymScore !== b.synonymScore) {
+        return b.synonymScore - a.synonymScore; // Higher score wins
       }
 
-      // 4. Shorter TTS wins (more specific emoji)
+      // 3. Shorter TTS wins (more specific emoji)
       return a.tts.length - b.tts.length;
     });
   }
@@ -950,8 +920,7 @@ async function main(): Promise<void> {
     };
   }
 
-  const wordRanks = await loadWordFrequency();
-  const result = buildEmojiDatabase(entries, localeData, wordRanks);
+  const result = buildEmojiDatabase(entries, localeData);
   writeOutput(result);
 
   execSync(`npx prettier --write "${OUTPUT_PATH}"`, { stdio: "inherit" });
