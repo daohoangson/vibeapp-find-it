@@ -1,8 +1,10 @@
 import { describe, it, expect, vi } from "vitest";
 
+import { deterministicShuffle } from "../test-utils/deterministic-shuffle";
+
 // Keep word order and distractor order deterministic for snapshot review.
 vi.mock("../shuffle", () => ({
-  shuffle: <T>(items: T[]) => items,
+  shuffle: <T>(items: T[]) => deterministicShuffle(items),
 }));
 
 import { getAllTopics } from "./index";

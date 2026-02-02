@@ -1,14 +1,16 @@
 import { describe, it, expect, vi } from "vitest";
 
+import { deterministicShuffle } from "./test-utils/deterministic-shuffle";
+
 // Keep distractor order deterministic for snapshot review.
 vi.mock("./shuffle", () => ({
-  shuffle: <T>(items: T[]) => items,
+  shuffle: <T>(items: T[]) => deterministicShuffle(items),
 }));
 
 import { generateLocalContent } from "./game-content";
 
-const COMMON_WORDS = [
-  // Animals
+const WORDS = [
+  // Animals & pets
   "dog",
   "cat",
   "cow",
@@ -19,8 +21,29 @@ const COMMON_WORDS = [
   "duck",
   "rabbit",
   "monkey",
+  "pig",
+  "sheep",
+  "ram",
+  "ewe",
+  "goat",
+  "chicken",
+  "rooster",
+  "bird",
+  "frog",
+  "turtle",
+  "snake",
+  "bear",
+  "tiger",
+  "zebra",
+  "giraffe",
+  "dolphin",
+  "shark",
+  "octopus",
+  "butterfly",
+  "bee",
+  "ladybug",
 
-  // Foods
+  // Foods & drinks
   "pizza",
   "ice cream",
   "cake",
@@ -28,16 +51,39 @@ const COMMON_WORDS = [
   "bread",
   "cheese",
   "egg",
+  "hamburger",
+  "hot dog",
+  "fries",
+  "doughnut",
+  "donut",
+  "noodle",
+  "rice",
+  "soup",
+  "salad",
+  "sandwich",
+  "milk",
+  "water",
+  "juice",
 
-  // Fruits
+  // Fruits & vegetables
   "apple",
   "banana",
   "orange",
   "grapes",
   "watermelon",
   "cherry",
+  "strawberry",
+  "lemon",
+  "pear",
+  "peach",
+  "carrot",
+  "corn",
+  "potato",
+  "tomato",
+  "broccoli",
+  "cucumber",
 
-  // Vehicles
+  // Vehicles & transport
   "car",
   "bus",
   "train",
@@ -46,6 +92,24 @@ const COMMON_WORDS = [
   "boat",
   "bicycle",
   "helicopter",
+  "airplane",
+  "motorcycle",
+  "scooter",
+  "tractor",
+  "ambulance",
+  "fire truck",
+  "police car",
+  "rocket",
+  "subway",
+
+  // Body parts
+  "hand",
+  "foot",
+  "eye",
+  "ear",
+  "nose",
+  "mouth",
+  "tooth",
 
   // Colors (English + translations)
   "red",
@@ -57,6 +121,11 @@ const COMMON_WORDS = [
   "rojo",
   "azul",
   "verde",
+  "pink",
+  "brown",
+  "black",
+  "white",
+  "gray",
 
   // Shapes / symbols
   "circle",
@@ -65,8 +134,12 @@ const COMMON_WORDS = [
   "star",
   "heart",
   "diamond",
+  "rectangle",
+  "oval",
+  "hexagon",
+  "octagon",
 
-  // Emotions
+  // Emotions & synonyms
   "happy",
   "sad",
   "angry",
@@ -77,6 +150,15 @@ const COMMON_WORDS = [
   "excited",
   "worried",
   "crying",
+  "smile",
+  "smiling face",
+  "cry",
+  "crying face",
+  "loudly crying face",
+  "fearful face",
+  "worried face",
+  "partying face",
+  "star-struck",
 
   // Flags / places
   "United States",
@@ -84,10 +166,30 @@ const COMMON_WORDS = [
   "Japan",
   "Australia",
 
-  // Misc
+  // Professions & people
+  "doctor",
+  "health worker",
+  "police officer",
+  "firefighter",
+  "teacher",
+  "pilot",
+  "cook",
+
+  // Celebrations & misc
   "balloon",
   "gift",
   "party",
+  "birthday",
+  "christmas",
+  "halloween",
+  "fireworks",
+  "snowman",
+  "rainbow",
+  "ball",
+  "book",
+  "toy",
+  "clock",
+  "key",
 ];
 
 const summarize = (word: string) => {
@@ -97,8 +199,8 @@ const summarize = (word: string) => {
 };
 
 describe("generateLocalContent snapshot", () => {
-  it("summarizes common words deterministically", () => {
-    const summary = COMMON_WORDS.map((word) => summarize(word));
+  it("summarizes words deterministically", () => {
+    const summary = WORDS.map((word) => summarize(word));
     expect(summary).toMatchSnapshot();
   });
 });
