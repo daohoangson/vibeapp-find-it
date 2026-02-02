@@ -1,7 +1,8 @@
-export { InputScreen } from "./InputScreen";
-export { LoadingScreen } from "./LoadingScreen";
-export { GameScreen, type GameItem } from "./GameScreen";
-export { SuccessScreen } from "./SuccessScreen";
-export { Confetti } from "./Confetti";
+export * from "./GameScreen";
+export * from "./InputScreen";
+export * from "./LoadingScreen";
+export * from "./SuccessScreen";
+export * from "./Confetti";
 export * from "./SoundToggle";
+export * from "./KeyboardHelp";
 

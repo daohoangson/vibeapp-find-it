@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import { SoundToggle } from "@/components/SoundToggle";
+import { KeyboardHelp } from "@/components/KeyboardHelp";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -33,6 +34,7 @@ export default function RootLayout({
         <div className="fixed top-4 right-4 z-50">
           <SoundToggle />
         </div>
+        <KeyboardHelp />
         {children}
       </body>
     </html>

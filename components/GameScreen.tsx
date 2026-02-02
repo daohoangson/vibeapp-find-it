@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowLeft, PlayCircle } from "lucide-react";
 import { isSpeechAvailable, speakWord } from "@/lib/speech";
 import { playPopSound } from "@/lib/audio";
@@ -55,6 +56,7 @@ export function GameScreen({
 }: GameScreenProps) {
   const hasCorrectAnswer = items.some((item) => item.status === "correct");
   const { soundEnabled } = useSoundSettings();
+  const router = useRouter();
 
   // Check speech availability only on client to avoid hydration mismatch
   const [speechAvailable, setSpeechAvailable] = useState(false);
@@ -62,6 +64,47 @@ export function GameScreen({
   useEffect(() => {
     setSpeechAvailable(isSpeechAvailable());
   }, []);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+      if (e.key === "Escape") {
+        playPopSound();
+        router.push("/");
+        return;
+      }
+
+      const keyMap: Record<string, number> = {
+        "1": 0,
+        a: 0,
+        "2": 1,
+        s: 1,
+        b: 1,
+        "3": 2,
+        d: 2,
+        c: 2,
+      };
+
+      if (e.key in keyMap) {
+        const index = keyMap[e.key];
+        const item = items[index];
+        // Only click if item is valid and clickable
+        if (
+          item &&
+          item.status !== "wrong" &&
+          item.status !== "correct" &&
+          !hasCorrectAnswer
+        ) {
+          onItemClick(item.id);
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [items, hasCorrectAnswer, router]);
 
   // Announce the word when the game screen loads
   useEffect(() => {
