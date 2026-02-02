@@ -6,6 +6,7 @@ export function useSoundSettings() {
 
   useEffect(() => {
     if (!mounted) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setMounted(true);
     }
     const stored = localStorage.getItem("3moji-sound");

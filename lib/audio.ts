@@ -13,7 +13,7 @@ function isSoundEnabled(): boolean {
   try {
     const stored = localStorage.getItem("3moji-sound");
     return stored === null ? true : JSON.parse(stored);
-  } catch (e) {
+  } catch {
     return true;
   }
 }

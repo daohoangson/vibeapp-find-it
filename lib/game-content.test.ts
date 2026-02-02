@@ -1,8 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  generateLocalContent,
-  fixVisuallySimilarEmojis,
-} from "./game-content";
+import { generateLocalContent, fixVisuallySimilarEmojis } from "./game-content";
 import { areVisuallySimilar } from "./emoji-data";
 
 describe("generateLocalContent", () => {

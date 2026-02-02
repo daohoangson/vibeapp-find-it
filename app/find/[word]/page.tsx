@@ -26,11 +26,11 @@ async function GameContent({ word }: { word: string }) {
 
   if (!data) {
     return (
-      <div className="h-screen w-screen overflow-hidden text-slate-900 select-none flex flex-col items-center justify-center gap-4 bg-gradient-to-b from-sky-200 to-sky-100">
+      <div className="flex h-screen w-screen flex-col items-center justify-center gap-4 overflow-hidden bg-gradient-to-b from-sky-200 to-sky-100 text-slate-900 select-none">
         <p className="text-xl">Could not find game for &quot;{word}&quot;</p>
         <Link
           href="/"
-          className="px-6 py-3 bg-sky-500 text-white rounded-full text-lg font-semibold hover:bg-sky-600 transition-colors"
+          className="rounded-full bg-sky-500 px-6 py-3 text-lg font-semibold text-white transition-colors hover:bg-sky-600"
         >
           Try Another Word
         </Link>

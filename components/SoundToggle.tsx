@@ -19,7 +19,7 @@ export function SoundToggle() {
   return (
     <button
       onClick={handleToggle}
-      className="rounded-full bg-white/50 p-3 text-slate-600 shadow-sm backdrop-blur-md transition-all hover:bg-white hover:text-sky-600 hover:shadow-md touch-manipulation focus:ring-2 focus:ring-sky-500 active:scale-95"
+      className="cursor-pointer touch-manipulation rounded-full bg-white/50 p-3 text-slate-600 shadow-sm backdrop-blur-md transition-all hover:bg-white hover:text-sky-600 hover:shadow-md focus:ring-2 focus:ring-sky-500 active:scale-95"
       aria-label={soundEnabled ? "Mute sound" : "Enable sound"}
     >
       {soundEnabled ? (

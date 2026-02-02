@@ -161,7 +161,9 @@ export function getDistractors(
   // Filter out the target and any visually similar emojis
   const validDistractors = categoryItems.filter((item) => {
     const itemKey = normalizeEmoji(item.emoji);
-    return itemKey !== targetKey && !areVisuallySimilar(targetEmoji, item.emoji);
+    return (
+      itemKey !== targetKey && !areVisuallySimilar(targetEmoji, item.emoji)
+    );
   });
 
   // Shuffle and take count items

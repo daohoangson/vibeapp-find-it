@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
@@ -125,17 +125,17 @@ export function GameScreen({
           prefetch={true}
           onClick={() => playPopSound()}
           aria-label="Go back"
-          className="rounded-full bg-white/80 p-3 text-slate-400 shadow-sm backdrop-blur-md transition-all hover:scale-105 hover:bg-white hover:text-sky-600 hover:shadow-md touch-manipulation focus:ring-2 focus:ring-sky-500 focus:outline-none active:scale-95"
+          className="touch-manipulation rounded-full bg-white/80 p-3 text-slate-400 shadow-sm backdrop-blur-md transition-all hover:scale-105 hover:bg-white hover:text-sky-600 hover:shadow-md focus:ring-2 focus:ring-sky-500 focus:outline-none active:scale-95"
         >
           <ArrowLeft className="h-6 w-6 stroke-[3px]" />
         </Link>
         <button
           onClick={handleSpeakClick}
-          className="mx-4 flex max-w-[70%] items-center justify-center truncate rounded-full border-b-4 border-sky-100 bg-white/90 px-8 py-3 shadow-lg backdrop-blur-md touch-manipulation transition-all hover:scale-105 hover:border-sky-200 active:scale-95 sm:px-10"
+          className="mx-4 flex max-w-[70%] cursor-pointer touch-manipulation items-center justify-center truncate rounded-full border-b-4 border-sky-100 bg-white/90 px-8 py-3 shadow-lg backdrop-blur-md transition-all hover:scale-105 hover:border-sky-200 active:scale-95 sm:px-10"
         >
           <h2 className="truncate text-xl font-black tracking-tight text-slate-800 sm:text-3xl">
             Find:{" "}
-            <span className="text-sky-600 underline decoration-sky-300 decoration-solid decoration-2 underline-offset-4 capitalize">
+            <span className="text-sky-600 capitalize underline decoration-sky-300 decoration-solid decoration-2 underline-offset-4">
               {inputWord}
             </span>
           </h2>
@@ -159,7 +159,7 @@ export function GameScreen({
                 animationDelay:
                   item.status === "normal" ? `${index * 150}ms` : "0ms",
               }}
-              className={`relative min-h-0 min-w-0 flex-1 touch-manipulation overflow-hidden rounded-3xl border-b-[8px] focus:outline-none sm:rounded-[2.5rem] sm:border-b-[12px] ${
+              className={`relative min-h-0 min-w-0 flex-1 cursor-pointer touch-manipulation overflow-hidden rounded-3xl border-b-[8px] focus:outline-none sm:rounded-[2.5rem] sm:border-b-[12px] ${
                 isWrong
                   ? "cursor-not-allowed border-transparent bg-slate-100 opacity-50 shadow-none grayscale"
                   : "transform transition-all duration-300"
