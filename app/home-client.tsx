@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Sparkles, ArrowRight, Search, ChevronRight } from "lucide-react";
 import { TopicCard } from "@/components";
-import { unlockAudio } from "@/lib/audio";
+import { unlockAudio, playPopSound } from "@/lib/audio";
 import type { Topic } from "@/lib/topics";
 
 interface HomeClientProps {
@@ -23,6 +23,7 @@ export default function HomeClient({
   const handleStart = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!inputWord.trim()) return;
+    playPopSound();
     await unlockAudio();
     router.push(`/find/${encodeURIComponent(inputWord.trim())}`);
   };
@@ -62,6 +63,7 @@ export default function HomeClient({
             <Link
               href="/topics"
               prefetch={true}
+              onClick={() => playPopSound()}
               className="flex items-center gap-1 text-sm font-bold text-sky-600 transition-colors hover:text-sky-700"
             >
               See All
@@ -88,8 +90,11 @@ export default function HomeClient({
                 key={word}
                 href={`/find/${encodeURIComponent(word)}`}
                 prefetch={true}
-                onClick={() => unlockAudio()}
-                className={`rounded-2xl px-4 py-2 text-sm font-bold transition-all hover:-translate-y-1 hover:shadow-md active:translate-y-0 ${
+                onClick={() => {
+                  playPopSound();
+                  unlockAudio();
+                }}
+                className={`rounded-xl px-4 py-2 text-sm font-bold transition-all hover:-translate-y-1 hover:shadow-md active:translate-y-0 ${
                   i % 3 === 0
                     ? "bg-sky-100 text-sky-700 hover:bg-sky-200"
                     : i % 3 === 1

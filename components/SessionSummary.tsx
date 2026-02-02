@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { RefreshCw, Home, PartyPopper, Star } from "lucide-react";
 import { Confetti } from "./Confetti";
+import { playPopSound } from "@/lib/audio";
 
 interface SessionSummaryProps {
   topicId: string;
@@ -23,6 +24,7 @@ export function SessionSummary({
   const isPerfect = correctCount === totalRounds;
 
   const handlePlayAgain = () => {
+    playPopSound();
     // Force a full page reload to bypass all client-side caching and get fresh rounds
     window.location.href = `/topics/${topicId}/play`;
   };
@@ -112,6 +114,7 @@ export function SessionSummary({
           <Link
             href="/topics"
             prefetch={true}
+            onClick={() => playPopSound()}
             className="group flex flex-1 items-center justify-center gap-3 rounded-2xl bg-white px-6 py-4 text-lg font-black text-slate-700 shadow-lg ring-1 ring-slate-200 transition-all hover:-translate-y-1 hover:scale-105 hover:shadow-xl focus:ring-4 focus:ring-slate-500/30 focus:outline-none active:translate-y-1 active:scale-95"
           >
             <Home className="h-6 w-6" />
