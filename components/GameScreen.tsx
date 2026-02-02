@@ -106,19 +106,27 @@ export function GameScreen({
 
       {/* Game Area */}
       <div className="mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col items-stretch justify-center gap-4 p-4 sm:gap-8 sm:p-8 landscape:flex-row">
-        {items.map((item) => {
+        {items.map((item, index) => {
           const isWrong = item.status === "wrong";
           const isCorrect = item.status === "correct";
 
           return (
             <button
-              key={item.id}
+              key={`${item.id}-${item.status}`}
               onClick={() => onItemClick(item.id)}
               disabled={isWrong || hasCorrectAnswer}
               aria-label={`Option: ${item.value}`}
-              className={`relative min-h-0 min-w-0 flex-1 transform overflow-hidden rounded-3xl border-b-[8px] touch-manipulation transition-all duration-300 focus:outline-none sm:rounded-[2.5rem] sm:border-b-[12px] ${
+              style={{
+                animationDelay:
+                  item.status === "normal" ? `${index * 150}ms` : "0ms",
+              }}
+              className={`relative min-h-0 min-w-0 flex-1 overflow-hidden rounded-3xl border-b-[8px] touch-manipulation focus:outline-none sm:rounded-[2.5rem] sm:border-b-[12px] ${
+                isWrong
+                  ? "cursor-not-allowed border-transparent bg-slate-100 opacity-50 shadow-none grayscale"
+                  : "transform transition-all duration-300"
+              } ${
                 !isWrong && !isCorrect
-                  ? "border-slate-200 bg-white shadow-xl"
+                  ? "animate-pop-in border-slate-200 bg-white shadow-xl"
                   : ""
               } ${
                 !isWrong && !isCorrect && !hasCorrectAnswer
@@ -129,16 +137,16 @@ export function GameScreen({
                   ? "cursor-default opacity-50 grayscale"
                   : ""
               } ${
-                isWrong
-                  ? "scale-95 cursor-not-allowed border-transparent bg-slate-100 opacity-50 shadow-none grayscale"
-                  : ""
-              } ${
                 isCorrect
                   ? "z-10 scale-105 border-green-500 bg-green-50 ring-4 shadow-green-200 ring-green-400 ring-offset-4 ring-offset-transparent"
                   : ""
               } `}
             >
-              <div className="pointer-events-none absolute inset-3 flex items-center justify-center overflow-hidden rounded-2xl bg-slate-50/50 sm:inset-5 sm:rounded-3xl">
+              <div
+                className={`pointer-events-none absolute inset-3 flex items-center justify-center overflow-hidden rounded-2xl bg-slate-50/50 sm:inset-5 sm:rounded-3xl ${
+                  isWrong ? "animate-shake" : ""
+                }`}
+              >
                 {isCorrect && (
                   <div className="absolute inset-0 z-10 animate-pulse bg-green-400/20" />
                 )}
