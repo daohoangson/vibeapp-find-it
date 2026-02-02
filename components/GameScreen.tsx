@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, PlayCircle } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { isSpeechAvailable, speakWord } from "@/lib/speech";
 import { playPopSound } from "@/lib/audio";
 import { useSoundSettings } from "@/lib/hooks";
@@ -62,6 +62,7 @@ export function GameScreen({
   const [speechAvailable, setSpeechAvailable] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     setSpeechAvailable(isSpeechAvailable());
   }, []);
 
@@ -104,7 +105,7 @@ export function GameScreen({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [items, hasCorrectAnswer, router]);
+  }, [items, hasCorrectAnswer, router, onItemClick]);
 
   // Announce the word when the game screen loads
   useEffect(() => {

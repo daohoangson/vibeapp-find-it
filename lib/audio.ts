@@ -28,8 +28,8 @@ export async function unlockAudio(): Promise<void> {
     if (ctx.state === "suspended") {
       await ctx.resume();
     }
-  } catch (e) {
-    console.warn("Audio unlock failed", e);
+  } catch {
+    console.warn("Audio unlock failed");
   }
 }
 
@@ -70,8 +70,8 @@ export function playSuccessSound(): void {
       osc.start(startTime);
       osc.stop(startTime + duration + 0.1);
     });
-  } catch (e) {
-    console.error("Audio play failed", e);
+  } catch {
+    console.error("Audio play failed");
   }
 }
 
@@ -106,7 +106,7 @@ export function playPopSound(): void {
 
     osc.start(now);
     osc.stop(now + 0.15);
-  } catch (e) {
+  } catch {
     // Ignore errors for UI sounds
   }
 }
@@ -141,7 +141,7 @@ export function playErrorSound(): void {
 
     osc.start(now);
     osc.stop(now + 0.35);
-  } catch (e) {
-    console.error("Audio error", e);
+  } catch {
+    console.error("Audio error");
   }
 }

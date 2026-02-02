@@ -5,12 +5,14 @@ export function useSoundSettings() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    if (!mounted) {
+      setMounted(true);
+    }
     const stored = localStorage.getItem("3moji-sound");
     if (stored !== null) {
       setSoundEnabled(JSON.parse(stored));
     }
-  }, []);
+  }, [mounted]);
 
   const toggleSound = () => {
     const newState = !soundEnabled;
