@@ -58,14 +58,6 @@ export function GameScreen({
   const { soundEnabled } = useSoundSettings();
   const router = useRouter();
 
-  // Check speech availability only on client to avoid hydration mismatch
-  const [speechAvailable, setSpeechAvailable] = useState(false);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    setSpeechAvailable(isSpeechAvailable());
-  }, []);
-
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -109,16 +101,17 @@ export function GameScreen({
 
   // Announce the word when the game screen loads
   useEffect(() => {
-    if (speechAvailable && soundEnabled) {
+    if (isSpeechAvailable() && soundEnabled) {
       // Small delay to let the screen render first
       const timer = setTimeout(() => {
         speakWord(inputWord);
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [inputWord, speechAvailable, soundEnabled]);
+  }, [inputWord, soundEnabled]);
 
   const handleSpeakClick = () => {
+    if (!isSpeechAvailable()) return;
     playPopSound();
     speakWord(inputWord);
   };
@@ -138,12 +131,7 @@ export function GameScreen({
         </Link>
         <button
           onClick={handleSpeakClick}
-          disabled={!speechAvailable}
-          className={`mx-4 flex max-w-[70%] items-center justify-center truncate rounded-full border-b-4 border-sky-100 bg-white/90 px-8 py-3 shadow-lg backdrop-blur-md touch-manipulation transition-all sm:px-10 ${
-            speechAvailable
-              ? "cursor-pointer hover:scale-105 hover:border-sky-200 active:scale-95"
-              : "cursor-default"
-          }`}
+          className="mx-4 flex max-w-[70%] items-center justify-center truncate rounded-full border-b-4 border-sky-100 bg-white/90 px-8 py-3 shadow-lg backdrop-blur-md touch-manipulation transition-all hover:scale-105 hover:border-sky-200 active:scale-95 sm:px-10"
         >
           <h2 className="truncate text-xl font-black tracking-tight text-slate-800 sm:text-3xl">
             Find:{" "}
