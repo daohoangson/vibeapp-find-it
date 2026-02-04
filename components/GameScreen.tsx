@@ -7,6 +7,7 @@ import { ArrowLeft } from "lucide-react";
 import { isSpeechAvailable, speakWord } from "@/lib/speech";
 import { playPopSound } from "@/lib/audio";
 import { useSoundSettings } from "@/lib/hooks";
+import { SoundToggle } from "./SoundToggle";
 
 export interface GameItem {
   id: string;
@@ -142,7 +143,7 @@ export function GameScreen({
             </span>
           </h2>
         </button>
-        <div className="w-12" /> {/* Spacer for centering */}
+        <SoundToggle />
       </div>
 
       {/* Game Area */}
