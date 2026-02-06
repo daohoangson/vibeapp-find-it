@@ -1,4 +1,3 @@
-export { InputScreen } from "./InputScreen";
 export { LoadingScreen } from "./LoadingScreen";
 export { GameScreen, type GameItem } from "./GameScreen";
 export { SuccessScreen } from "./SuccessScreen";
@@ -8,3 +7,4 @@ export { KeyboardHelp } from "./KeyboardHelp";
 export { SessionProgress } from "./SessionProgress";
 export { SessionSummary } from "./SessionSummary";
 export { TopicCard } from "./TopicCard";
+export { PageHeader, PageHeaderSkeleton } from "./PageHeader";

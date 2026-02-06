@@ -1,12 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
 import { isSpeechAvailable, speakWord } from "@/lib/speech";
 import { playPopSound } from "@/lib/audio";
 import { useSoundSettings } from "@/lib/hooks";
+import { PageHeader } from "./PageHeader";
 
 export interface GameItem {
   id: string;
@@ -118,32 +117,29 @@ export function GameScreen({
     speakWord(inputWord);
   };
 
+  const wordButton = (
+    <button
+      onClick={handleSpeakClick}
+      className="mx-4 flex max-w-[70%] cursor-pointer touch-manipulation items-center justify-center truncate rounded-full border-b-4 border-sky-100 bg-white/90 px-8 py-3 shadow-lg backdrop-blur-md transition-all hover:scale-105 hover:border-sky-200 active:scale-95 sm:px-10"
+    >
+      <h2 className="truncate text-xl font-black tracking-tight text-slate-800 sm:text-3xl">
+        Find:{" "}
+        <span className="text-sky-600 capitalize underline decoration-sky-300 decoration-solid decoration-2 underline-offset-4">
+          {inputWord}
+        </span>
+      </h2>
+    </button>
+  );
+
   return (
     <main className="fixed inset-0 flex flex-col items-center overflow-hidden bg-gradient-to-br from-sky-100 via-blue-50 to-emerald-50">
-      {/* Header */}
-      <div className="z-20 flex w-full shrink-0 items-center justify-between px-4 py-4 sm:px-6">
-        <Link
-          href={backHref}
-          prefetch={true}
-          onClick={() => playPopSound()}
-          aria-label="Go back"
-          className="touch-manipulation rounded-full bg-white/80 p-3 text-slate-400 shadow-sm backdrop-blur-md transition-all hover:scale-105 hover:bg-white hover:text-sky-600 hover:shadow-md focus:ring-2 focus:ring-sky-500 focus:outline-none active:scale-95"
-        >
-          <ArrowLeft className="h-6 w-6 stroke-[3px]" />
-        </Link>
-        <button
-          onClick={handleSpeakClick}
-          className="mx-4 flex max-w-[70%] cursor-pointer touch-manipulation items-center justify-center truncate rounded-full border-b-4 border-sky-100 bg-white/90 px-8 py-3 shadow-lg backdrop-blur-md transition-all hover:scale-105 hover:border-sky-200 active:scale-95 sm:px-10"
-        >
-          <h2 className="truncate text-xl font-black tracking-tight text-slate-800 sm:text-3xl">
-            Find:{" "}
-            <span className="text-sky-600 capitalize underline decoration-sky-300 decoration-solid decoration-2 underline-offset-4">
-              {inputWord}
-            </span>
-          </h2>
-        </button>
-        <div className="w-12" /> {/* Spacer for centering */}
-      </div>
+      <PageHeader
+        backHref={backHref}
+        centerContent={wordButton}
+        sticky={false}
+        showBackground={false}
+        className="shrink-0"
+      />
 
       {/* Game Area */}
       <div className="mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col items-stretch justify-center gap-4 p-4 sm:gap-8 sm:p-8 landscape:flex-row">

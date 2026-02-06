@@ -1,3 +1,5 @@
+import { PageHeaderSkeleton } from "@/components";
+
 export default function TopicDetailLoading() {
   return (
     <main className="min-h-screen overflow-x-hidden bg-gradient-to-br from-sky-100 via-blue-50 to-emerald-50 pb-12">
@@ -8,13 +10,7 @@ export default function TopicDetailLoading() {
         style={{ animationDelay: "0.7s" }}
       />
 
-      {/* Header skeleton */}
-      <header className="sticky top-0 z-20 px-4 py-4 sm:px-6">
-        <div className="mx-auto flex max-w-4xl items-center justify-between">
-          <div className="h-12 w-12 animate-pulse rounded-full bg-white/80 shadow-sm" />
-          <div className="w-12" />
-        </div>
-      </header>
+      <PageHeaderSkeleton showBackground={false} />
 
       {/* Content skeleton */}
       <div className="relative z-10 mx-auto max-w-4xl px-4 py-4 sm:px-6 sm:py-8">

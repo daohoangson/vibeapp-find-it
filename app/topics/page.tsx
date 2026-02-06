@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
-import { TopicCard } from "@/components";
+import { TopicCard, PageHeader } from "@/components";
 import { getTopicsByLevel, getLevelInfo, type TopicLevel } from "@/lib/topics";
 
 export const metadata: Metadata = {
@@ -27,23 +25,7 @@ export default function TopicsPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-sky-100 via-blue-50 to-emerald-50">
-      {/* Header */}
-      <header className="sticky top-0 z-20 bg-white/80 px-4 py-4 shadow-sm backdrop-blur-md sm:px-6">
-        <div className="mx-auto flex max-w-6xl items-center justify-between">
-          <Link
-            href="/"
-            prefetch={true}
-            aria-label="Go back"
-            className="rounded-full bg-white/80 p-3 text-slate-400 shadow-sm transition-all hover:scale-105 hover:bg-white hover:text-sky-600 hover:shadow-md focus:ring-2 focus:ring-sky-500 focus:outline-none active:scale-95"
-          >
-            <ArrowLeft className="h-6 w-6 stroke-[3px]" />
-          </Link>
-          <h1 className="text-2xl font-black tracking-tight text-slate-800 sm:text-3xl">
-            Choose a Topic
-          </h1>
-          <div className="w-12" />
-        </div>
-      </header>
+      <PageHeader backHref="/" title="Choose a Topic" />
 
       {/* Content */}
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
@@ -71,7 +53,7 @@ export default function TopicsPage() {
                 {topics.map((topic) => (
                   <div
                     key={topic.id}
-                    className="flex w-full min-w-[160px] max-w-[280px] flex-1 sm:w-64"
+                    className="flex w-full max-w-[280px] min-w-[160px] flex-1 sm:w-64"
                   >
                     <TopicCard topic={topic} />
                   </div>

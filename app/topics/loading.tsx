@@ -1,14 +1,9 @@
+import { PageHeaderSkeleton } from "@/components";
+
 export default function TopicsLoading() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-sky-100 via-blue-50 to-emerald-50">
-      {/* Header skeleton */}
-      <header className="sticky top-0 z-20 bg-white/80 px-4 py-4 shadow-sm backdrop-blur-md sm:px-6">
-        <div className="mx-auto flex max-w-6xl items-center justify-between">
-          <div className="h-12 w-12 animate-pulse rounded-full bg-slate-200" />
-          <div className="h-8 w-48 animate-pulse rounded-lg bg-slate-200" />
-          <div className="w-12" />
-        </div>
-      </header>
+      <PageHeaderSkeleton showTitle />
 
       {/* Content skeleton */}
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">

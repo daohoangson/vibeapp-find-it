@@ -4,8 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Sparkles, ArrowRight, Search, ChevronRight } from "lucide-react";
-import { TopicCard } from "@/components";
-import { unlockAudio } from "@/lib/audio";
+import { TopicCard, PageHeader } from "@/components";
+import { unlockAudio, playPopSound } from "@/lib/audio";
 import type { Topic } from "@/lib/topics";
 
 interface HomeClientProps {
@@ -20,20 +20,22 @@ export default function HomeClient({
   const router = useRouter();
   const [inputWord, setInputWord] = useState("");
 
-  const handleStart = async () => {
+  const handleStart = async (e?: React.FormEvent) => {
+    e?.preventDefault();
     if (!inputWord.trim()) return;
+    playPopSound();
     await unlockAudio();
     router.push(`/find/${encodeURIComponent(inputWord.trim())}`);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && inputWord.trim()) {
-      handleStart();
-    }
-  };
-
   return (
-    <main className="min-h-screen overflow-y-auto bg-gradient-to-br from-sky-100 via-blue-50 to-emerald-50 px-4 py-8 text-slate-900 sm:px-6 sm:py-12">
+    <main className="relative min-h-screen overflow-y-auto bg-gradient-to-br from-sky-100 via-blue-50 to-emerald-50 text-slate-900">
+      <PageHeader
+        sticky={false}
+        showBackground={false}
+        className="absolute top-0 right-0 left-0"
+      />
+
       {/* Background decoration */}
       <div className="animate-bounce-gentle fixed top-10 left-10 h-32 w-32 rounded-full bg-sky-300 opacity-20 blur-3xl" />
       <div
@@ -41,7 +43,7 @@ export default function HomeClient({
         style={{ animationDelay: "1s" }}
       />
 
-      <div className="relative z-10 mx-auto max-w-4xl">
+      <div className="relative z-10 mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-12">
         {/* Header */}
         <header className="mb-8 text-center sm:mb-12">
           <div className="mb-4 flex justify-center">
@@ -67,7 +69,8 @@ export default function HomeClient({
             <Link
               href="/topics"
               prefetch={true}
-              className="flex items-center gap-1 text-sm font-bold text-sky-600 transition-colors hover:text-sky-700"
+              onClick={() => playPopSound()}
+              className="flex touch-manipulation items-center gap-1 text-sm font-bold text-sky-600 transition-colors hover:text-sky-700"
             >
               See All
               <ChevronRight className="h-4 w-4" />
@@ -93,8 +96,11 @@ export default function HomeClient({
                 key={word}
                 href={`/find/${encodeURIComponent(word)}`}
                 prefetch={true}
-                onClick={() => unlockAudio()}
-                className={`rounded-xl px-4 py-2 text-sm font-bold transition-all hover:-translate-y-1 hover:shadow-md active:translate-y-0 ${
+                onClick={() => {
+                  playPopSound();
+                  unlockAudio();
+                }}
+                className={`touch-manipulation rounded-2xl px-4 py-2 text-sm font-bold transition-all hover:-translate-y-1 hover:shadow-md active:translate-y-0 ${
                   i % 3 === 0
                     ? "bg-sky-100 text-sky-700 hover:bg-sky-200"
                     : i % 3 === 1
@@ -107,7 +113,7 @@ export default function HomeClient({
             ))}
           </div>
 
-          <div className="space-y-4">
+          <form onSubmit={handleStart} className="space-y-4">
             <div className="group relative">
               <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center pl-1">
                 <Search className="h-5 w-5 text-slate-400 transition-colors group-focus-within:text-sky-500 sm:h-6 sm:w-6" />
@@ -116,22 +122,21 @@ export default function HomeClient({
                 type="text"
                 value={inputWord}
                 onChange={(e) => setInputWord(e.target.value)}
-                onKeyDown={handleKeyDown}
                 placeholder="Type a word..."
-                className="w-full rounded-xl border-4 border-slate-100 bg-slate-50 py-4 pr-4 pl-12 text-lg font-bold text-slate-800 placeholder-slate-300 transition-all hover:border-sky-200 focus:border-sky-500 focus:bg-white focus:ring-4 focus:ring-sky-500/20 focus:outline-none sm:rounded-2xl sm:py-5 sm:pl-14 sm:text-2xl"
+                className="w-full rounded-2xl border-4 border-slate-100 bg-slate-50 py-4 pr-4 pl-12 text-lg font-bold text-slate-800 placeholder-slate-300 transition-all hover:border-sky-200 focus:border-sky-500 focus:bg-white focus:ring-4 focus:ring-sky-500/20 focus:outline-none sm:rounded-2xl sm:py-5 sm:pl-14 sm:text-2xl"
                 autoFocus
               />
             </div>
 
             <button
-              onClick={handleStart}
+              type="submit"
               disabled={!inputWord.trim()}
-              className="group relative flex w-full items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 py-4 text-lg font-black text-white shadow-xl shadow-sky-500/30 transition-all hover:scale-[1.02] hover:shadow-2xl hover:shadow-sky-500/40 focus:ring-4 focus:ring-sky-500/30 focus:outline-none active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none sm:rounded-2xl sm:py-5 sm:text-xl"
+              className="group relative flex w-full touch-manipulation items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 py-4 text-lg font-black text-white shadow-xl shadow-sky-500/30 transition-all hover:scale-[1.02] hover:shadow-2xl hover:shadow-sky-500/40 focus:ring-4 focus:ring-sky-500/30 focus:outline-none active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none sm:rounded-2xl sm:py-5 sm:text-xl"
             >
               <span className="drop-shadow-md">Let&apos;s Play!</span>
               <ArrowRight className="h-6 w-6 stroke-[3px] transition-transform group-hover:translate-x-1 sm:h-7 sm:w-7" />
             </button>
-          </div>
+          </form>
         </section>
 
         <footer className="mt-8 text-center text-xs font-semibold tracking-widest text-slate-400 uppercase opacity-50">
