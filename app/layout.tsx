@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import Script from "next/script";
-import { SoundToggle } from "@/components/SoundToggle";
 import { KeyboardHelp } from "@/components/KeyboardHelp";
 import "./globals.css";
 
@@ -45,9 +44,6 @@ export default function RootLayout({
             gtag('config', 'G-X8B5CLPKL4');
           `}
         </Script>
-        <div className="fixed top-4 right-4 z-50">
-          <SoundToggle />
-        </div>
         <KeyboardHelp />
         {children}
       </body>

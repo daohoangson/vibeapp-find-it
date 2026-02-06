@@ -119,11 +119,7 @@ export function generateLocalContent(word: string): GameContent | null {
   // Check if it's an emoji name
   const emojiMatch = findEmojiByName(normalizedWord);
   if (emojiMatch) {
-    const distractors = getDistractors(
-      emojiMatch.emoji,
-      emojiMatch.category,
-      2,
-    );
+    const distractors = getDistractors(emojiMatch.emoji, emojiMatch.category, 2);
 
     // If we don't have enough distractors in the same category, return null
     // (let LLM handle it)
